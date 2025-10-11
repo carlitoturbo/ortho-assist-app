@@ -26,13 +26,14 @@ const Settings = () => {
   };
 
   return (
-    <div className="h-full overflow-auto space-y-6 pb-24">
-      <div>
+    <div className="h-full flex flex-col">
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-border py-6 px-6 -mx-6 -mt-6 mb-6">
         <h1 className="text-3xl font-bold text-foreground">Settings</h1>
         <p className="text-muted-foreground mt-1">Manage your clinic preferences and notifications.</p>
       </div>
 
-      <div className="space-y-4">
+      <div className="flex-1 overflow-auto pb-24 space-y-4">
+        <div className="space-y-4">
         <Collapsible open={openSections.clinicInfo} onOpenChange={() => toggleSection('clinicInfo')}>
           <Card>
             <CardContent className="p-0">
@@ -197,6 +198,7 @@ const Settings = () => {
             </CardContent>
           </Card>
         </Collapsible>
+        </div>
       </div>
 
       <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-t border-border p-4">
