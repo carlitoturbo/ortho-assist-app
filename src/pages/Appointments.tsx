@@ -137,7 +137,7 @@ const Appointments = () => {
                 ref={(el) => (appointmentRefs.current[apt.id] = el)}
                 className={cn(
                   "hover:shadow-md transition-all duration-200 cursor-pointer",
-                  isHighlighted && "ring-2 ring-primary shadow-lg scale-[1.02]"
+                  isHighlighted && "ring-2 ring-primary shadow-lg"
                 )}
                 onClick={() => handleAppointmentInteraction(apt.id)}
               >
