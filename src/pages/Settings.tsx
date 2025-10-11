@@ -22,7 +22,7 @@ const Settings = () => {
       <Accordion type="multiple" className="space-y-4">
         <AccordionItem value="clinic-info" className="border rounded-lg">
           <Card className="border-0">
-            <AccordionTrigger className="px-6 hover:no-underline">
+            <AccordionTrigger className="px-6 hover:no-underline [&>div]:flex-1 [&>div]:text-right">
               <CardHeader className="p-0">
                 <CardTitle>Clinic Information</CardTitle>
                 <CardDescription>Update your clinic details and contact information.</CardDescription>
@@ -57,7 +57,7 @@ const Settings = () => {
 
         <AccordionItem value="working-hours" className="border rounded-lg">
           <Card className="border-0">
-            <AccordionTrigger className="px-6 hover:no-underline">
+            <AccordionTrigger className="px-6 hover:no-underline [&>div]:flex-1 [&>div]:text-right">
               <CardHeader className="p-0">
                 <CardTitle>Working Hours</CardTitle>
                 <CardDescription>Set your clinic's operating hours.</CardDescription>
@@ -82,7 +82,7 @@ const Settings = () => {
 
         <AccordionItem value="notifications" className="border rounded-lg">
           <Card className="border-0">
-            <AccordionTrigger className="px-6 hover:no-underline">
+            <AccordionTrigger className="px-6 hover:no-underline [&>div]:flex-1 [&>div]:text-right">
               <CardHeader className="p-0">
                 <CardTitle>Notifications</CardTitle>
                 <CardDescription>Configure how you receive appointment reminders.</CardDescription>
@@ -120,7 +120,7 @@ const Settings = () => {
 
         <AccordionItem value="appointment-settings" className="border rounded-lg">
           <Card className="border-0">
-            <AccordionTrigger className="px-6 hover:no-underline">
+            <AccordionTrigger className="px-6 hover:no-underline [&>div]:flex-1 [&>div]:text-right">
               <CardHeader className="p-0">
                 <CardTitle>Appointment Settings</CardTitle>
                 <CardDescription>Configure default appointment durations.</CardDescription>
