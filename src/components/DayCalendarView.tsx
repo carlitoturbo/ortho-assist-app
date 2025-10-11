@@ -108,6 +108,7 @@ export const DayCalendarView = ({ date, time, duration, patientName, treatment, 
                     
                     const widthPercent = overlappingCount > 1 ? 100 / overlappingCount : 100;
                     const leftPercent = idx * widthPercent;
+                    const widthOffset = overlappingCount > 1 ? 8 : 4;
                     
                     let bgClass = "bg-gray-200 dark:bg-gray-700";
                     let borderClass = "border-gray-400 dark:border-gray-500";
@@ -138,8 +139,8 @@ export const DayCalendarView = ({ date, time, duration, patientName, treatment, 
                         style={{
                           top: `${((apt.start - hour) * 100)}%`,
                           height: `${apt.duration * 64}px`,
-                          left: `${leftPercent}%`,
-                          width: `calc(${widthPercent}% - 8px)`,
+                          left: overlappingCount > 1 ? `${leftPercent}%` : '8px',
+                          width: overlappingCount > 1 ? `calc(${widthPercent}% - ${widthOffset}px)` : 'calc(100% - 16px)',
                         }}
                       >
                         <div className="flex flex-col h-full overflow-hidden">
