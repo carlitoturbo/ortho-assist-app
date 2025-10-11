@@ -146,16 +146,15 @@ export const DayCalendarView = ({ date, time, duration, patientName, treatment, 
                           width: `calc(${widthPercent}% - 8px)`,
                         }}
                       >
-                        <div className="flex flex-col h-full">
+                        <div className="flex flex-col h-full overflow-hidden">
                           <p className={cn("text-sm font-semibold line-clamp-1", textClass)}>
                             {apt.patientName}
                           </p>
-                          <p className={cn("text-xs line-clamp-1", textClass, "opacity-90")}>
-                            {apt.treatment}
-                          </p>
-                          <p className={cn("text-xs mt-auto", textClass, "opacity-80")}>
-                            {apt.time} • {apt.duration}
-                          </p>
+                          {apt.duration > 0.5 && (
+                            <p className={cn("text-xs line-clamp-1", textClass, "opacity-90")}>
+                              {apt.treatment}
+                            </p>
+                          )}
                         </div>
                       </div>
                     );
