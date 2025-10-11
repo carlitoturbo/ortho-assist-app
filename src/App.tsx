@@ -20,12 +20,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => (
     <div className="flex min-h-screen w-full flex-col bg-background">
       <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-border bg-background px-6 shadow-sm">
         <SidebarTrigger />
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary p-1">
-            <img src={toothIcon} alt="Tooth icon" className="h-full w-full object-contain" />
-          </div>
-          <span className="text-lg font-semibold text-foreground">Nelly Furtado</span>
-        </div>
+        <span className="text-lg font-semibold text-foreground">Nelly Furtado</span>
       </header>
       <div className="flex flex-1 overflow-hidden">
         <DentalSidebar />
