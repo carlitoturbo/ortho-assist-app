@@ -230,8 +230,9 @@ const Planning = () => {
                         <TooltipTrigger asChild>
                           <Button
                             size="icon"
+                            variant="ghost"
                             onClick={() => handleAccept(request.id)}
-                            className="h-10 w-10 rounded-full bg-green-100 text-green-700 hover:bg-green-200"
+                            className="h-9 w-9 text-green-600 hover:text-green-700 hover:bg-green-50"
                           >
                             <Check className="h-5 w-5" />
                           </Button>
@@ -243,8 +244,9 @@ const Planning = () => {
                         <TooltipTrigger asChild>
                           <Button
                             size="icon"
+                            variant="ghost"
                             onClick={() => handleProposeTime(request)}
-                            className="h-10 w-10 rounded-full bg-orange-100 text-orange-700 hover:bg-orange-200"
+                            className="h-9 w-9 hover:bg-muted"
                           >
                             <CalendarClock className="h-5 w-5" />
                           </Button>
@@ -256,8 +258,9 @@ const Planning = () => {
                         <TooltipTrigger asChild>
                           <Button
                             size="icon"
+                            variant="ghost"
                             onClick={() => handleDecline(request.id)}
-                            className="h-10 w-10 rounded-full bg-red-100 text-red-700 hover:bg-red-200"
+                            className="h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
                           >
                             <X className="h-5 w-5" />
                           </Button>
