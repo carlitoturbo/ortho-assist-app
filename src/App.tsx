@@ -8,6 +8,7 @@ import { DentalSidebar } from "@/components/DentalSidebar";
 import Dashboard from "./pages/Dashboard";
 import Planning from "./pages/Planning";
 import Appointments from "./pages/Appointments";
+import AppointmentDetail from "./pages/AppointmentDetail";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/" element={<Layout><Dashboard /></Layout>} />
           <Route path="/planning" element={<Layout><Planning /></Layout>} />
           <Route path="/appointments" element={<Layout><Appointments /></Layout>} />
+          <Route path="/appointments/:id" element={<Layout><AppointmentDetail /></Layout>} />
           <Route path="/settings" element={<Layout><Settings /></Layout>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
