@@ -21,8 +21,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => (
       <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-border bg-background px-6 shadow-sm">
         <SidebarTrigger />
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center">
-            <img src={dentalIcon} alt="Dental icon" className="h-8 w-8" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-background p-1">
+            <img src={dentalIcon} alt="Dental icon" className="h-full w-full object-contain" />
           </div>
           <span className="text-lg font-semibold text-foreground">Nelly Furtado</span>
         </div>
