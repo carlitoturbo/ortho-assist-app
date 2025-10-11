@@ -17,11 +17,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => (
   <SidebarProvider>
     <div className="flex min-h-screen w-full bg-background">
       <DentalSidebar />
-      <div className="flex flex-1 flex-col overflow-auto">
+      <div className="flex flex-1 flex-col">
         <header className="sticky top-0 z-10 flex h-16 items-center border-b border-border bg-background px-6 shadow-sm">
           <SidebarTrigger />
         </header>
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-6">{children}</main>
       </div>
     </div>
   </SidebarProvider>
