@@ -53,9 +53,19 @@ export const DayCalendarView = ({ date, time, duration, patientName, treatment, 
   const earliestStart = Math.min(...allStartTimes);
   const latestEnd = Math.max(...allEndTimes);
   
-  // Show 1 hour before earliest and 2 hours after latest
-  const startHour = Math.max(0, Math.floor(earliestStart) - 1);
-  const endHour = Math.min(23, Math.ceil(latestEnd) + 2);
+  // Show 1 hour before earliest and 2 hours after latest, but cap at 3 hours total
+  let startHour = Math.max(0, Math.floor(earliestStart) - 1);
+  let endHour = Math.min(23, Math.ceil(latestEnd) + 2);
+  
+  // Cap the range to 3 hours maximum
+  const totalHours = endHour - startHour;
+  if (totalHours > 3) {
+    // Keep the appointment in view, prioritize showing after the appointment
+    const midPoint = Math.floor(earliestStart);
+    startHour = Math.max(0, midPoint - 1);
+    endHour = Math.min(23, startHour + 3);
+  }
+  
   const hours = Array.from({ length: endHour - startHour + 1 }, (_, i) => i + startHour);
   
   // Detect overlapping appointments for each hour slot
