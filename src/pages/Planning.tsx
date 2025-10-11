@@ -35,6 +35,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { DayCalendarView } from "@/components/DayCalendarView";
 
 interface AppointmentRequest {
   id: number;
@@ -273,33 +274,47 @@ const Planning = () => {
                   {/* Expanded Details */}
                   {isExpanded && (
                     <div className="border-t border-border bg-muted/30 p-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-3">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div>
+                          <DayCalendarView
+                            date={request.requestedDate}
+                            time={request.requestedTime}
+                            duration={request.duration}
+                            patientName={request.patient}
+                            treatment={request.treatment}
+                          />
+                        </div>
+                        
+                        <div className="space-y-4">
                           <div>
-                            <p className="text-sm font-medium text-muted-foreground mb-1">Treatment</p>
-                            <p className="text-sm text-foreground">{request.treatment}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-muted-foreground mb-1">Contact</p>
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2 text-sm text-foreground">
-                                <Phone className="h-3 w-3 text-muted-foreground" />
-                                <span>{request.phone}</span>
+                            <p className="text-sm font-medium text-muted-foreground mb-2">Patient Details</p>
+                            <div className="space-y-3 bg-background border border-border rounded-lg p-4">
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Treatment</p>
+                                <p className="text-sm text-foreground font-medium">{request.treatment}</p>
                               </div>
-                              <div className="flex items-center gap-2 text-sm text-foreground">
-                                <Mail className="h-3 w-3 text-muted-foreground" />
-                                <span>{request.email}</span>
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Contact</p>
+                                <div className="space-y-1">
+                                  <div className="flex items-center gap-2 text-sm text-foreground">
+                                    <Phone className="h-3 w-3 text-muted-foreground" />
+                                    <span>{request.phone}</span>
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm text-foreground">
+                                    <Mail className="h-3 w-3 text-muted-foreground" />
+                                    <span>{request.email}</span>
+                                  </div>
+                                </div>
                               </div>
+                              {request.notes && (
+                                <div>
+                                  <p className="text-xs text-muted-foreground mb-1">Patient Notes</p>
+                                  <p className="text-sm text-foreground">{request.notes}</p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>
-
-                        {request.notes && (
-                          <div>
-                            <p className="text-sm font-medium text-muted-foreground mb-1">Patient Notes</p>
-                            <p className="text-sm text-foreground">{request.notes}</p>
-                          </div>
-                        )}
                       </div>
                     </div>
                   )}
