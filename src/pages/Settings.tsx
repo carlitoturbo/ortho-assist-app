@@ -26,7 +26,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="h-full overflow-auto space-y-6">
+    <div className="h-full overflow-auto space-y-6 pb-24">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Settings</h1>
         <p className="text-muted-foreground mt-1">Manage your clinic preferences and notifications.</p>
@@ -199,10 +199,12 @@ const Settings = () => {
         </Collapsible>
       </div>
 
-      <div className="flex justify-end mt-6">
-        <Button onClick={handleSave} size="lg">
-          Save Settings
-        </Button>
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-t border-border p-4">
+        <div className="max-w-7xl mx-auto flex justify-end">
+          <Button onClick={handleSave} size="lg">
+            Save Settings
+          </Button>
+        </div>
       </div>
     </div>
   );
