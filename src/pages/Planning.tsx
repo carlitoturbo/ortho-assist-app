@@ -275,16 +275,6 @@ const Planning = () => {
                   {isExpanded && (
                     <div className="border-t border-border bg-muted/30 p-4">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div>
-                          <DayCalendarView
-                            date={request.requestedDate}
-                            time={request.requestedTime}
-                            duration={request.duration}
-                            patientName={request.patient}
-                            treatment={request.treatment}
-                          />
-                        </div>
-                        
                         <div className="space-y-4">
                           <div>
                             <p className="text-sm font-medium text-muted-foreground mb-2">Patient Details</p>
@@ -314,6 +304,16 @@ const Planning = () => {
                               )}
                             </div>
                           </div>
+                        </div>
+                        
+                        <div>
+                          <DayCalendarView
+                            date={request.requestedDate}
+                            time={request.requestedTime}
+                            duration={request.duration}
+                            patientName={request.patient}
+                            treatment={request.treatment}
+                          />
                         </div>
                       </div>
                     </div>
