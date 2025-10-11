@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar as CalendarIcon, Clock, Phone, Mail, X, Check, CalendarClock, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Phone, Mail, X, Check, CalendarClock, ChevronDown, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -218,9 +218,9 @@ const Planning = () => {
                       onClick={() => toggleRow(request.id)}
                     >
                       {isExpanded ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
                         <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
                       )}
                     </Button>
 
