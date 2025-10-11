@@ -47,24 +47,10 @@ export const DayCalendarView = ({ date, time, duration, patientName, treatment, 
   const appointmentStartHour = parseTime(time);
   const durationHours = parseDuration(duration);
   
-  // Calculate time range to show
-  const allStartTimes = allAppointments.map(apt => parseTime(apt.time));
-  const allEndTimes = allAppointments.map((apt, idx) => parseTime(apt.time) + parseDuration(apt.duration));
-  const earliestStart = Math.min(...allStartTimes);
-  const latestEnd = Math.max(...allEndTimes);
-  
-  // Show 1 hour before earliest and 2 hours after latest, but cap at 3 hours total
-  let startHour = Math.max(0, Math.floor(earliestStart) - 1);
-  let endHour = Math.min(23, Math.ceil(latestEnd) + 2);
-  
-  // Cap the range to 3 hours maximum
-  const totalHours = endHour - startHour;
-  if (totalHours > 3) {
-    // Keep the appointment in view, prioritize showing after the appointment
-    const midPoint = Math.floor(earliestStart);
-    startHour = Math.max(0, midPoint - 1);
-    endHour = Math.min(23, startHour + 3);
-  }
+  // Always start 1 hour before the current appointment
+  let startHour = Math.max(0, Math.floor(appointmentStartHour) - 1);
+  // Show 3 hours total
+  let endHour = Math.min(23, startHour + 3);
   
   const hours = Array.from({ length: endHour - startHour + 1 }, (_, i) => i + startHour);
   
