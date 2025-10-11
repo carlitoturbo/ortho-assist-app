@@ -144,8 +144,6 @@ export const AppointmentsDayCalendar = ({
                           width: overlappingCount > 1 ? `calc(${widthPercent}% - ${widthOffset}px)` : "calc(100% - 16px)",
                         }}
                         onClick={() => onAppointmentClick(apt.id)}
-                        onMouseEnter={() => onAppointmentHover(apt.id)}
-                        onMouseLeave={() => onAppointmentHover(null)}
                       >
                         <div className="flex flex-col h-full overflow-hidden">
                           {apt.duration >= 0.75 ? (

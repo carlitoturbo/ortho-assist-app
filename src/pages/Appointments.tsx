@@ -139,8 +139,6 @@ const Appointments = () => {
                   isHighlighted && "ring-2 ring-primary shadow-lg scale-[1.02]"
                 )}
                 onClick={() => handleAppointmentInteraction(apt.id)}
-                onMouseEnter={() => setHighlightedId(apt.id)}
-                onMouseLeave={() => setHighlightedId(null)}
               >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
