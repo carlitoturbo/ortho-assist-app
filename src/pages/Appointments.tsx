@@ -27,7 +27,7 @@ const Appointments = () => {
     {
       id: 1,
       date: "Today",
-      time: "2:00 PM",
+      time: "14:00",
       patient: "Emily Davis",
       phone: "(555) 234-5678",
       email: "emily.d@email.com",
@@ -38,7 +38,7 @@ const Appointments = () => {
     {
       id: 2,
       date: "Today",
-      time: "3:30 PM",
+      time: "15:30",
       patient: "James Wilson",
       phone: "(555) 345-6789",
       email: "james.w@email.com",
@@ -49,7 +49,7 @@ const Appointments = () => {
     {
       id: 3,
       date: "Today",
-      time: "9:00 AM",
+      time: "09:00",
       patient: "Sarah Johnson",
       phone: "(555) 111-2222",
       email: "sarah.j@email.com",
@@ -60,7 +60,7 @@ const Appointments = () => {
     {
       id: 4,
       date: "Today",
-      time: "11:00 AM",
+      time: "11:00",
       patient: "Robert Brown",
       phone: "(555) 567-8901",
       email: "robert.b@email.com",
@@ -71,7 +71,7 @@ const Appointments = () => {
     {
       id: 5,
       date: "Tomorrow",
-      time: "10:30 AM",
+      time: "10:30",
       patient: "Maria Garcia",
       phone: "(555) 678-9012",
       email: "maria.g@email.com",
@@ -82,7 +82,7 @@ const Appointments = () => {
     {
       id: 6,
       date: "Tomorrow",
-      time: "2:00 PM",
+      time: "14:00",
       patient: "David Lee",
       phone: "(555) 789-0123",
       email: "david.l@email.com",
@@ -92,8 +92,8 @@ const Appointments = () => {
     },
     {
       id: 7,
-      date: "Mar 15, 2025",
-      time: "9:30 AM",
+      date: "15/03/2025",
+      time: "09:30",
       patient: "Jennifer Taylor",
       phone: "(555) 890-1234",
       email: "jennifer.t@email.com",
@@ -103,8 +103,8 @@ const Appointments = () => {
     },
     {
       id: 8,
-      date: "Mar 15, 2025",
-      time: "1:00 PM",
+      date: "15/03/2025",
+      time: "13:00",
       patient: "Michael Anderson",
       phone: "(555) 901-2345",
       email: "michael.a@email.com",

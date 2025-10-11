@@ -20,17 +20,11 @@ interface AppointmentsDayCalendarProps {
 }
 
 const parseTime = (timeStr: string): number => {
-  const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/);
+  const match = timeStr.match(/(\d+):(\d+)/);
   if (!match) return 9;
   
-  const [, hours, minutes, period] = match;
-  let hour24 = parseInt(hours);
-  
-  if (period === "PM" && hour24 !== 12) {
-    hour24 = hour24 + 12;
-  } else if (period === "AM" && hour24 === 12) {
-    hour24 = 0;
-  }
+  const [, hours, minutes] = match;
+  const hour24 = parseInt(hours);
   
   return hour24 + parseInt(minutes) / 60;
 };
@@ -58,7 +52,7 @@ export const AppointmentsDayCalendar = ({
     }
   }, [highlightedId]);
 
-  const hours = Array.from({ length: 10 }, (_, i) => i + 8); // 8 AM to 5 PM
+  const hours = Array.from({ length: 10 }, (_, i) => i + 8); // 8:00 to 17:00
   
   // Detect overlapping appointments for each hour slot
   const getAppointmentsInSlot = (hour: number) => {
@@ -87,8 +81,7 @@ export const AppointmentsDayCalendar = ({
       <div className="border border-border rounded-lg overflow-hidden bg-background flex-1 overflow-y-auto">
         <div className="relative">
           {hours.map((hour) => {
-            const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-            const period = hour >= 12 ? "PM" : "AM";
+            const displayHour = String(hour).padStart(2, '0');
             const appointmentsInSlot = getAppointmentsInSlot(hour);
             const overlappingCount = appointmentsInSlot.length;
             
@@ -102,7 +95,7 @@ export const AppointmentsDayCalendar = ({
               >
                 <div className="w-20 flex-shrink-0 p-2 border-r border-border bg-muted/30">
                   <span className="text-xs font-medium text-muted-foreground">
-                    {displayHour}:00 {period}
+                    {displayHour}:00
                   </span>
                 </div>
                 

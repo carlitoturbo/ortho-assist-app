@@ -39,16 +39,16 @@ import { DayCalendarView } from "@/components/DayCalendarView";
 
 // Mock data for other appointments on the same days
 const mockAppointments = {
-  "Mar 15, 2025": [
-    { time: "09:00 AM", duration: "45 min", patientName: "John Doe", treatment: "Filling", status: "confirmed" as const },
-    { time: "11:30 AM", duration: "30 min", patientName: "Jane Smith", treatment: "Checkup", status: "pending" as const },
+  "15/03/2025": [
+    { time: "09:00", duration: "45 min", patientName: "John Doe", treatment: "Filling", status: "confirmed" as const },
+    { time: "11:30", duration: "30 min", patientName: "Jane Smith", treatment: "Checkup", status: "pending" as const },
   ],
-  "Mar 16, 2025": [
-    { time: "10:00 AM", duration: "60 min", patientName: "Bob Wilson", treatment: "Cleaning", status: "confirmed" as const },
-    { time: "03:30 PM", duration: "30 min", patientName: "Alice Brown", treatment: "Consultation", status: "pending" as const },
+  "16/03/2025": [
+    { time: "10:00", duration: "60 min", patientName: "Bob Wilson", treatment: "Cleaning", status: "confirmed" as const },
+    { time: "15:30", duration: "30 min", patientName: "Alice Brown", treatment: "Consultation", status: "pending" as const },
   ],
-  "Mar 14, 2025": [
-    { time: "08:00 AM", duration: "90 min", patientName: "Chris Lee", treatment: "Root Canal", status: "confirmed" as const },
+  "14/03/2025": [
+    { time: "08:00", duration: "90 min", patientName: "Chris Lee", treatment: "Root Canal", status: "confirmed" as const },
   ],
 };
 
@@ -77,8 +77,8 @@ const Planning = () => {
       phone: "(555) 234-5678",
       email: "sarah.j@email.com",
       treatment: "Cleaning",
-      requestedDate: "Mar 15, 2025",
-      requestedTime: "10:00 AM",
+      requestedDate: "15/03/2025",
+      requestedTime: "10:00",
       duration: "60 min",
       notes: "First visit, mild anxiety about dental procedures",
       status: "pending",
@@ -89,8 +89,8 @@ const Planning = () => {
       phone: "(555) 345-6789",
       email: "michael.c@email.com",
       treatment: "Root Canal",
-      requestedDate: "Mar 16, 2025",
-      requestedTime: "02:00 PM",
+      requestedDate: "16/03/2025",
+      requestedTime: "14:00",
       duration: "90 min",
       notes: "Experiencing pain in lower right molar",
       status: "pending",
@@ -101,8 +101,8 @@ const Planning = () => {
       phone: "(555) 456-7890",
       email: "emily.d@email.com",
       treatment: "Checkup",
-      requestedDate: "Mar 14, 2025",
-      requestedTime: "09:00 AM",
+      requestedDate: "14/03/2025",
+      requestedTime: "09:00",
       duration: "30 min",
       status: "pending",
     },
@@ -112,8 +112,8 @@ const Planning = () => {
       phone: "(555) 567-8901",
       email: "james.w@email.com",
       treatment: "Filling",
-      requestedDate: "Mar 17, 2025",
-      requestedTime: "11:30 AM",
+      requestedDate: "17/03/2025",
+      requestedTime: "11:30",
       duration: "45 min",
       notes: "Cavity detected during last checkup",
       status: "pending",
@@ -124,8 +124,8 @@ const Planning = () => {
       phone: "(555) 678-9012",
       email: "lisa.a@email.com",
       treatment: "Whitening",
-      requestedDate: "Mar 18, 2025",
-      requestedTime: "03:00 PM",
+      requestedDate: "18/03/2025",
+      requestedTime: "15:00",
       duration: "60 min",
       status: "pending",
     },
@@ -363,7 +363,7 @@ const Planning = () => {
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {proposedDate ? format(proposedDate, "PPP") : "Pick a date"}
+                    {proposedDate ? format(proposedDate, "dd/MM/yyyy") : "Pick a date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -385,18 +385,18 @@ const Planning = () => {
                   <SelectValue placeholder="Select time" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="09:00">09:00 AM</SelectItem>
-                  <SelectItem value="09:30">09:30 AM</SelectItem>
-                  <SelectItem value="10:00">10:00 AM</SelectItem>
-                  <SelectItem value="10:30">10:30 AM</SelectItem>
-                  <SelectItem value="11:00">11:00 AM</SelectItem>
-                  <SelectItem value="11:30">11:30 AM</SelectItem>
-                  <SelectItem value="14:00">02:00 PM</SelectItem>
-                  <SelectItem value="14:30">02:30 PM</SelectItem>
-                  <SelectItem value="15:00">03:00 PM</SelectItem>
-                  <SelectItem value="15:30">03:30 PM</SelectItem>
-                  <SelectItem value="16:00">04:00 PM</SelectItem>
-                  <SelectItem value="16:30">04:30 PM</SelectItem>
+                  <SelectItem value="09:00">09:00</SelectItem>
+                  <SelectItem value="09:30">09:30</SelectItem>
+                  <SelectItem value="10:00">10:00</SelectItem>
+                  <SelectItem value="10:30">10:30</SelectItem>
+                  <SelectItem value="11:00">11:00</SelectItem>
+                  <SelectItem value="11:30">11:30</SelectItem>
+                  <SelectItem value="14:00">14:00</SelectItem>
+                  <SelectItem value="14:30">14:30</SelectItem>
+                  <SelectItem value="15:00">15:00</SelectItem>
+                  <SelectItem value="15:30">15:30</SelectItem>
+                  <SelectItem value="16:00">16:00</SelectItem>
+                  <SelectItem value="16:30">16:30</SelectItem>
                 </SelectContent>
               </Select>
             </div>

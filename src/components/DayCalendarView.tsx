@@ -19,17 +19,8 @@ interface DayCalendarViewProps {
 }
 
 const parseTime = (timeStr: string): number => {
-  const [time, period] = timeStr.split(" ");
-  const [hours, minutes] = time.split(":").map(Number);
-  let hour24 = hours;
-  
-  if (period === "PM" && hours !== 12) {
-    hour24 = hours + 12;
-  } else if (period === "AM" && hours === 12) {
-    hour24 = 0;
-  }
-  
-  return hour24 + minutes / 60;
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  return hours + (minutes || 0) / 60;
 };
 
 const parseDuration = (durationStr: string): number => {
@@ -81,8 +72,7 @@ export const DayCalendarView = ({ date, time, duration, patientName, treatment, 
       <div className="border border-border rounded-lg overflow-hidden bg-background">
         <div className="relative">
           {hours.map((hour) => {
-            const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-            const period = hour >= 12 ? "PM" : "AM";
+            const displayHour = String(hour).padStart(2, '0');
             const appointmentsInSlot = getAppointmentsInSlot(hour);
             const overlappingCount = appointmentsInSlot.length;
             
@@ -96,7 +86,7 @@ export const DayCalendarView = ({ date, time, duration, patientName, treatment, 
               >
                 <div className="w-20 flex-shrink-0 p-2 border-r border-border bg-muted/30">
                   <span className="text-xs font-medium text-muted-foreground">
-                    {displayHour}:00 {period}
+                    {displayHour}:00
                   </span>
                 </div>
                 

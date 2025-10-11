@@ -3,10 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Dashboard = () => {
   const todayAppointments = [
-    { time: "09:00 AM", patient: "Sarah Johnson", treatment: "Cleaning", status: "confirmed" },
-    { time: "10:30 AM", patient: "Michael Chen", treatment: "Root Canal", status: "confirmed" },
-    { time: "02:00 PM", patient: "Emily Davis", treatment: "Checkup", status: "pending" },
-    { time: "03:30 PM", patient: "James Wilson", treatment: "Filling", status: "confirmed" },
+    { time: "09:00", patient: "Sarah Johnson", treatment: "Cleaning", status: "confirmed" },
+    { time: "10:30", patient: "Michael Chen", treatment: "Root Canal", status: "confirmed" },
+    { time: "14:00", patient: "Emily Davis", treatment: "Checkup", status: "pending" },
+    { time: "15:30", patient: "James Wilson", treatment: "Filling", status: "confirmed" },
   ];
 
   const stats = [
