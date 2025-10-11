@@ -155,38 +155,83 @@ const AppointmentDetail = () => {
                 </div>
 
                 <div className="pt-6 border-t border-border">
-                  <h3 className="text-lg font-semibold text-foreground mb-4">Executive Summary</h3>
-                  <Card className="bg-muted/30">
-                    <CardContent className="p-6">
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-2">Reason for Visit</p>
-                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
-                            <li>Discomfort in lower right molar area</li>
-                            <li>Requesting checkup and assessment</li>
-                          </ul>
-                        </div>
-                        
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-2">Medical History</p>
-                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
-                            <li>No known allergies</li>
-                            <li>Root canal treatment 2 years ago</li>
-                            <li>Regular checkups every 6 months</li>
-                          </ul>
-                        </div>
+                  <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-4">Executive Summary</h3>
+                      <Card className="bg-muted/30">
+                        <CardContent className="p-6">
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground mb-2">Reason for Visit</p>
+                              <ul className="list-disc list-inside text-base text-foreground space-y-1">
+                                <li>Discomfort in lower right molar area</li>
+                                <li>Requesting checkup and assessment</li>
+                              </ul>
+                            </div>
+                            
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground mb-2">Medical History</p>
+                              <ul className="list-disc list-inside text-base text-foreground space-y-1">
+                                <li>No known allergies</li>
+                                <li>Root canal treatment 2 years ago</li>
+                                <li>Regular checkups every 6 months</li>
+                              </ul>
+                            </div>
 
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-2">Additional Notes</p>
-                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
-                            <li>Prefers morning appointments</li>
-                            <li>Slight anxiety about dental procedures</li>
-                            <li>Prefers detailed explanations before treatment</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground mb-2">Additional Notes</p>
+                              <ul className="list-disc list-inside text-base text-foreground space-y-1">
+                                <li>Prefers morning appointments</li>
+                                <li>Slight anxiety about dental procedures</li>
+                                <li>Prefers detailed explanations before treatment</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground mb-4">Patient Information</h3>
+                      <Card className="bg-muted/30">
+                        <CardContent className="p-6">
+                          <div className="space-y-4">
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground mb-2">Current Medications</p>
+                              <ul className="list-disc list-inside text-base text-foreground space-y-1">
+                                <li>Ibuprofen 400mg as needed</li>
+                                <li>Multivitamin daily</li>
+                              </ul>
+                            </div>
+                            
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground mb-2">Allergies</p>
+                              <ul className="list-disc list-inside text-base text-foreground space-y-1">
+                                <li>None reported</li>
+                              </ul>
+                            </div>
+
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground mb-2">Previous Treatments</p>
+                              <ul className="list-disc list-inside text-base text-foreground space-y-1">
+                                <li>Root canal (2 years ago)</li>
+                                <li>Teeth whitening (1 year ago)</li>
+                                <li>Wisdom teeth extraction (5 years ago)</li>
+                              </ul>
+                            </div>
+
+                            <div>
+                              <p className="text-sm font-medium text-muted-foreground mb-2">Insurance</p>
+                              <ul className="list-disc list-inside text-base text-foreground space-y-1">
+                                <li>Provider: Delta Dental</li>
+                                <li>Policy #: DD-12345678</li>
+                              </ul>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
