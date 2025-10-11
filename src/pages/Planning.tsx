@@ -39,20 +39,14 @@ import {
 } from "@/components/ui/tooltip";
 import { DayCalendarView } from "@/components/DayCalendarView";
 
-// Mock data for other appointments on the same days
-const mockAppointments = {
-  "15/03/2025": [
-    { time: "09:00", duration: "45 min", patientName: "John Doe", treatment: "Filling", status: "confirmed" as const },
-    { time: "11:30", duration: "30 min", patientName: "Jane Smith", treatment: "Checkup", status: "pending" as const },
-  ],
-  "16/03/2025": [
-    { time: "10:00", duration: "60 min", patientName: "Bob Wilson", treatment: "Cleaning", status: "confirmed" as const },
-    { time: "15:30", duration: "30 min", patientName: "Alice Brown", treatment: "Consultation", status: "pending" as const },
-  ],
-  "14/03/2025": [
-    { time: "08:00", duration: "90 min", patientName: "Chris Lee", treatment: "Root Canal", status: "confirmed" as const },
-  ],
-};
+interface CalendarAppointment {
+  time: string;
+  duration: string;
+  patientName: string;
+  treatment: string;
+  status: "current" | "confirmed" | "pending";
+  date: string; // Store date as yyyy-MM-dd for easy comparison
+}
 
 interface AppointmentRequest {
   id: number;
@@ -74,6 +68,7 @@ interface ExpandedState {
 
 const Planning = () => {
   const [requests, setRequests] = useState<AppointmentRequest[]>([]);
+  const [allAppointments, setAllAppointments] = useState<CalendarAppointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterDate, setFilterDate] = useState<Date>();
@@ -91,7 +86,8 @@ const Planning = () => {
 
   const fetchAppointments = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch all appointments for calendar context
+      const { data: allData, error: allError } = await supabase
         .from("appointments")
         .select(`
           *,
@@ -102,14 +98,27 @@ const Planning = () => {
             mail
           )
         `)
-        .eq("status", "pending")
         .gte("appointment_date", format(startOfToday(), "yyyy-MM-dd"))
         .order("appointment_date", { ascending: true })
         .order("appointment_time", { ascending: true });
 
-      if (error) throw error;
+      if (allError) throw allError;
 
-      const formattedAppointments: AppointmentRequest[] = data.map((apt: any) => {
+      // Format all appointments for calendar view
+      const calendarAppts: CalendarAppointment[] = allData.map((apt: any) => ({
+        time: apt.appointment_time.substring(0, 5),
+        duration: `${apt.duration_minutes} min`,
+        patientName: `${apt.patients.first_name} ${apt.patients.last_name}`,
+        treatment: apt.treatment,
+        status: apt.status as "confirmed" | "pending",
+        date: apt.appointment_date, // Store as yyyy-MM-dd
+      }));
+
+      setAllAppointments(calendarAppts);
+
+      // Filter pending requests
+      const pendingData = allData.filter((apt: any) => apt.status === "pending");
+      const formattedRequests: AppointmentRequest[] = pendingData.map((apt: any) => {
         const appointmentDate = new Date(apt.appointment_date);
         return {
           id: apt.id,
@@ -126,13 +135,24 @@ const Planning = () => {
         };
       });
 
-      setRequests(formattedAppointments);
+      setRequests(formattedRequests);
     } catch (error) {
       console.error("Error fetching appointments:", error);
       toast.error("Failed to load appointments");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const getAppointmentsForDate = (dateStr: string, excludePatient: string): CalendarAppointment[] => {
+    // Parse the date string (dd/MM/yyyy format) and convert to yyyy-MM-dd
+    const [day, month, year] = dateStr.split('/');
+    const targetDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    
+    // Filter allAppointments to match the date and exclude the current patient
+    return allAppointments.filter(apt => {
+      return apt.date === targetDate && apt.patientName !== excludePatient;
+    });
   };
 
   const handleAccept = async (id: number) => {
@@ -415,7 +435,7 @@ const Planning = () => {
                             duration={request.duration}
                             patientName={request.patient}
                             treatment={request.treatment}
-                            otherAppointments={mockAppointments[request.requestedDate as keyof typeof mockAppointments] || []}
+                            otherAppointments={getAppointmentsForDate(request.requestedDate, request.patient)}
                           />
                         </div>
                       </div>
