@@ -32,7 +32,7 @@ export function DentalSidebar() {
                       end={item.url === "/"}
                       className={({ isActive }) =>
                         isActive
-                          ? "bg-primary/10 text-primary font-medium rounded-lg"
+                          ? "bg-muted rounded-lg"
                           : "hover:bg-sidebar-accent/50"
                       }
                     >
