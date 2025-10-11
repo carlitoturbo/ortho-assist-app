@@ -165,18 +165,6 @@ const AppointmentDetail = () => {
                   </CardContent>
                 </Card>
               </div>
-
-              <div className="flex gap-4 pt-6 border-t border-border">
-                <Button size="lg" className="flex-1">
-                  Edit Appointment
-                </Button>
-                <Button size="lg" variant="outline" className="flex-1">
-                  Reschedule
-                </Button>
-                <Button size="lg" variant="destructive" className="flex-1">
-                  Cancel Appointment
-                </Button>
-              </div>
             </div>
           </CardContent>
         </Card>
