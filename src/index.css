@@ -116,8 +116,8 @@ All colors MUST be HSL.
       45deg,
       transparent,
       transparent 10px,
-      rgba(0, 0, 0, 0.1) 10px,
-      rgba(0, 0, 0, 0.1) 20px
+      rgba(0, 0, 0, 0.05) 10px,
+      rgba(0, 0, 0, 0.05) 20px
     );
   }
   
@@ -126,8 +126,8 @@ All colors MUST be HSL.
       45deg,
       transparent,
       transparent 10px,
-      rgba(255, 255, 255, 0.1) 10px,
-      rgba(255, 255, 255, 0.1) 20px
+      rgba(255, 255, 255, 0.05) 10px,
+      rgba(255, 255, 255, 0.05) 20px
     );
   }
 }
