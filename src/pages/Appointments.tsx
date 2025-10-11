@@ -222,64 +222,66 @@ const Appointments = () => {
                 onClick={() => handleAppointmentInteraction(apt.id)}
               >
                 <CardContent className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-3 flex-1">
-                      <div className="flex items-center gap-3">
-                        <h3 className="text-lg font-semibold text-foreground">{apt.patient}</h3>
-                        <Badge
-                          variant={apt.status === "confirmed" ? "default" : "secondary"}
-                          className={
-                            apt.status === "confirmed"
-                              ? "bg-green-100 text-green-800 hover:bg-green-100"
-                              : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-                          }
-                        >
-                          {apt.status}
-                        </Badge>
-                      </div>
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="space-y-3 flex-1 min-w-0">
+                        <div className="flex items-center gap-3">
+                          <h3 className="text-lg font-semibold text-foreground">{apt.patient}</h3>
+                          <Badge
+                            variant={apt.status === "confirmed" ? "default" : "secondary"}
+                            className={
+                              apt.status === "confirmed"
+                                ? "bg-green-100 text-green-800 hover:bg-green-100"
+                                : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+                            }
+                          >
+                            {apt.status}
+                          </Badge>
+                        </div>
 
-                      <div className="grid grid-cols-3 gap-3 text-sm">
+                        <div className="grid grid-cols-3 gap-3 text-sm">
+                          <div>
+                            <p className="text-muted-foreground">Date</p>
+                            <p className="font-medium text-foreground flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              {apt.date}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Time</p>
+                            <p className="font-medium text-foreground">{apt.time}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Duration</p>
+                            <p className="font-medium text-foreground">{apt.duration}</p>
+                          </div>
+                        </div>
+
                         <div>
-                          <p className="text-muted-foreground">Date</p>
-                          <p className="font-medium text-foreground flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            {apt.date}
-                          </p>
+                          <p className="text-muted-foreground text-sm">Treatment</p>
+                          <p className="font-medium text-foreground">{apt.treatment}</p>
                         </div>
-                        <div>
-                          <p className="text-muted-foreground">Time</p>
-                          <p className="font-medium text-foreground">{apt.time}</p>
-                        </div>
-                        <div>
-                          <p className="text-muted-foreground">Duration</p>
-                          <p className="font-medium text-foreground">{apt.duration}</p>
+
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                          <div className="flex items-center gap-2">
+                            <Phone className="h-3 w-3" />
+                            <span>{apt.phone}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Mail className="h-3 w-3" />
+                            <span className="truncate">{apt.email}</span>
+                          </div>
                         </div>
                       </div>
 
-                      <div>
-                        <p className="text-muted-foreground text-sm">Treatment</p>
-                        <p className="font-medium text-foreground">{apt.treatment}</p>
+                      <div className="flex flex-col gap-2 flex-shrink-0">
+                        <Button variant="outline" size="sm" className="whitespace-nowrap">
+                          Edit
+                        </Button>
+                        <Button variant="outline" size="sm" className="whitespace-nowrap">
+                          Cancel
+                        </Button>
                       </div>
-
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                          <Phone className="h-3 w-3" />
-                          <span>{apt.phone}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Mail className="h-3 w-3" />
-                          <span>{apt.email}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        Edit
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        Cancel
-                      </Button>
                     </div>
                   </div>
                 </CardContent>
