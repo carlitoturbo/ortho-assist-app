@@ -26,20 +26,21 @@ export function DentalSidebar() {
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
-                    <NavLink
-                      to={item.url}
-                      end={item.url === "/"}
-                      className={({ isActive }) =>
-                        isActive
-                          ? "bg-muted rounded-lg"
-                          : "hover:bg-sidebar-accent/50"
-                      }
-                    >
-                      <item.icon className="h-5 w-5" />
-                      <span>{item.title}</span>
-                    </NavLink>
-                  </SidebarMenuButton>
+                  <NavLink
+                    to={item.url}
+                    end={item.url === "/"}
+                  >
+                    {({ isActive }) => (
+                      <SidebarMenuButton 
+                        tooltip={item.title}
+                        isActive={isActive}
+                        className={isActive ? "bg-muted" : ""}
+                      >
+                        <item.icon className="h-5 w-5" />
+                        <span>{item.title}</span>
+                      </SidebarMenuButton>
+                    )}
+                  </NavLink>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
