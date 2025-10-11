@@ -18,9 +18,9 @@ const queryClient = new QueryClient();
 const Layout = ({ children }: { children: React.ReactNode }) => (
   <SidebarProvider>
     <div className="flex min-h-screen w-full flex-col bg-background">
-      <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-border bg-background px-6 shadow-sm">
-        <SidebarTrigger />
-        <span className="text-lg font-semibold text-foreground">Nelly Furtado</span>
+      <header className="sticky top-0 z-20 flex h-16 items-center gap-4 border-b border-blue-700 bg-blue-600 px-6 shadow-sm">
+        <SidebarTrigger className="text-white hover:bg-blue-700" />
+        <span className="text-lg font-bold text-white">Nelly Furtado</span>
       </header>
       <div className="flex flex-1 overflow-hidden">
         <DentalSidebar />
