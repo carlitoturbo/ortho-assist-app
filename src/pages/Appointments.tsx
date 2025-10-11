@@ -52,6 +52,7 @@ const Appointments = () => {
             mail
           )
         `)
+        .neq("status", "declined")
         .order("appointment_date", { ascending: true })
         .order("appointment_time", { ascending: true });
 

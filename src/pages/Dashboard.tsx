@@ -23,7 +23,7 @@ const Dashboard = () => {
             first_name,
             last_name
           )
-        `).gte("appointment_date", today).order("appointment_date", {
+        `).gte("appointment_date", today).neq("status", "declined").order("appointment_date", {
         ascending: true
       }).order("appointment_time", {
         ascending: true
