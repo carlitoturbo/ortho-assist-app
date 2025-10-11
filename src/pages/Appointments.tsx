@@ -1,11 +1,17 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, Phone, Mail, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Phone, Mail, Calendar, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { AppointmentsDayCalendar } from "@/components/AppointmentsDayCalendar";
 import { useLocation } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface AppointmentType {
   id: number;
@@ -25,6 +31,7 @@ const Appointments = () => {
     location.state?.highlightId || null
   );
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  const [selectedAppointment, setSelectedAppointment] = useState<AppointmentType | null>(null);
   const appointmentRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
   const appointments: AppointmentType[] = [
@@ -156,6 +163,10 @@ const Appointments = () => {
   }, [location.state]);
 
   const handleAppointmentInteraction = (id: number) => {
+    const apt = appointments.find((a) => a.id === id);
+    if (apt) {
+      setSelectedAppointment(apt);
+    }
     setHighlightedId(id);
   };
 
@@ -308,6 +319,97 @@ const Appointments = () => {
           />
         </div>
       </div>
+
+      {/* Full-size Appointment Dialog */}
+      <Dialog open={!!selectedAppointment} onOpenChange={(open) => !open && setSelectedAppointment(null)}>
+        <DialogContent className="max-w-2xl">
+          {selectedAppointment && (
+            <>
+              <DialogHeader>
+                <div className="flex items-center justify-between">
+                  <DialogTitle className="text-2xl font-bold">Appointment Details</DialogTitle>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setSelectedAppointment(null)}
+                  >
+                    <X className="h-5 w-5" />
+                  </Button>
+                </div>
+              </DialogHeader>
+              
+              <div className="space-y-6 py-4">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-2xl font-semibold text-foreground">{selectedAppointment.patient}</h3>
+                  <Badge
+                    variant={selectedAppointment.status === "confirmed" ? "default" : "secondary"}
+                    className={
+                      selectedAppointment.status === "confirmed"
+                        ? "bg-green-100 text-green-800 hover:bg-green-100"
+                        : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
+                    }
+                  >
+                    {selectedAppointment.status}
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Date</p>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-primary" />
+                        <p className="text-lg font-medium text-foreground">{selectedAppointment.date}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Time</p>
+                      <p className="text-lg font-medium text-foreground">{selectedAppointment.time}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Duration</p>
+                      <p className="text-lg font-medium text-foreground">{selectedAppointment.duration}</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Treatment</p>
+                      <p className="text-lg font-medium text-foreground">{selectedAppointment.treatment}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Phone</p>
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        <p className="text-lg font-medium text-foreground">{selectedAppointment.phone}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Email</p>
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-muted-foreground" />
+                        <p className="text-lg font-medium text-foreground">{selectedAppointment.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-4 border-t">
+                  <Button variant="default" className="flex-1">
+                    Edit Appointment
+                  </Button>
+                  <Button variant="outline" className="flex-1">
+                    Reschedule
+                  </Button>
+                  <Button variant="destructive" className="flex-1">
+                    Cancel Appointment
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
