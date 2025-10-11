@@ -123,9 +123,9 @@ export const DayCalendarView = ({ date, time, duration, patientName, treatment, 
                       borderClass = "border-blue-600 dark:border-blue-700";
                       textClass = "text-white dark:text-white";
                     } else if (apt.status === "confirmed") {
-                      bgClass = "bg-blue-800 dark:bg-blue-900";
-                      borderClass = "border-blue-900 dark:border-blue-950";
-                      textClass = "text-white dark:text-white";
+                      bgClass = "bg-blue-200 dark:bg-blue-800";
+                      borderClass = "border-blue-300 dark:border-blue-900";
+                      textClass = "text-blue-900 dark:text-blue-100";
                     } else if (apt.status === "pending") {
                       patternClass = "striped-background";
                     }
