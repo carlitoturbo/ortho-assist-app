@@ -122,10 +122,10 @@ const AppointmentDetail = () => {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <Clock className="h-5 w-5 text-primary mt-1" />
+                    <Phone className="h-5 w-5 text-primary mt-1" />
                     <div>
-                      <p className="text-xs text-muted-foreground">Duration</p>
-                      <p className="text-base font-semibold text-foreground">{appointment.duration}</p>
+                      <p className="text-xs text-muted-foreground">Phone</p>
+                      <p className="text-base font-semibold text-foreground">{appointment.phone}</p>
                     </div>
                   </div>
 
@@ -138,17 +138,17 @@ const AppointmentDetail = () => {
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <Phone className="h-5 w-5 text-primary mt-1" />
+                    <Clock className="h-5 w-5 text-primary mt-1" />
                     <div>
-                      <p className="text-xs text-muted-foreground">Phone Number</p>
-                      <p className="text-base font-semibold text-foreground">{appointment.phone}</p>
+                      <p className="text-xs text-muted-foreground">Duration</p>
+                      <p className="text-base font-semibold text-foreground">{appointment.duration}</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4">
                     <Mail className="h-5 w-5 text-primary mt-1" />
                     <div>
-                      <p className="text-xs text-muted-foreground">Email Address</p>
+                      <p className="text-xs text-muted-foreground">Email</p>
                       <p className="text-base font-semibold text-foreground break-all">{appointment.email}</p>
                     </div>
                   </div>
