@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar as CalendarIcon, Clock, Phone, Mail, X, Check, CalendarClock } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Phone, Mail, X, Check, CalendarClock, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -29,6 +29,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface AppointmentRequest {
   id: number;
@@ -38,8 +44,13 @@ interface AppointmentRequest {
   treatment: string;
   requestedDate: string;
   requestedTime: string;
+  duration: string;
   notes?: string;
   status: "pending" | "accepted" | "declined";
+}
+
+interface ExpandedState {
+  [key: number]: boolean;
 }
 
 const Planning = () => {
@@ -52,6 +63,7 @@ const Planning = () => {
       treatment: "Cleaning",
       requestedDate: "Mar 15, 2025",
       requestedTime: "10:00 AM",
+      duration: "60 min",
       notes: "First visit, mild anxiety about dental procedures",
       status: "pending",
     },
@@ -63,6 +75,7 @@ const Planning = () => {
       treatment: "Root Canal",
       requestedDate: "Mar 16, 2025",
       requestedTime: "02:00 PM",
+      duration: "90 min",
       notes: "Experiencing pain in lower right molar",
       status: "pending",
     },
@@ -74,6 +87,7 @@ const Planning = () => {
       treatment: "Checkup",
       requestedDate: "Mar 14, 2025",
       requestedTime: "09:00 AM",
+      duration: "30 min",
       status: "pending",
     },
     {
@@ -84,6 +98,7 @@ const Planning = () => {
       treatment: "Filling",
       requestedDate: "Mar 17, 2025",
       requestedTime: "11:30 AM",
+      duration: "45 min",
       notes: "Cavity detected during last checkup",
       status: "pending",
     },
@@ -95,9 +110,12 @@ const Planning = () => {
       treatment: "Whitening",
       requestedDate: "Mar 18, 2025",
       requestedTime: "03:00 PM",
+      duration: "60 min",
       status: "pending",
     },
   ]);
+
+  const [expandedRows, setExpandedRows] = useState<ExpandedState>({});
 
   const [proposeDialogOpen, setProposeDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<AppointmentRequest | null>(null);
@@ -135,9 +153,17 @@ const Planning = () => {
     setSelectedRequest(null);
   };
 
+  const toggleRow = (id: number) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
   const pendingRequests = requests.filter((r) => r.status === "pending");
 
   return (
+    <TooltipProvider>
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
@@ -160,84 +186,127 @@ const Planning = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid gap-4">
-          {pendingRequests.map((request) => (
-            <Card key={request.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between gap-6">
-                  <div className="space-y-4 flex-1">
-                    <div className="flex items-center gap-3">
-                      <h3 className="text-xl font-semibold text-foreground">{request.patient}</h3>
-                      <Badge className="bg-accent text-accent-foreground">New Request</Badge>
-                    </div>
+        <div className="space-y-2">
+          {pendingRequests.map((request) => {
+            const isExpanded = expandedRows[request.id];
+            
+            return (
+              <Card key={request.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-0">
+                  {/* Compact Row */}
+                  <div className="flex items-center gap-4 p-4">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={() => toggleRow(request.id)}
+                    >
+                      {isExpanded ? (
+                        <ChevronUp className="h-4 w-4" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4" />
+                      )}
+                    </Button>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-sm">
-                          <CalendarIcon className="h-4 w-4 text-primary" />
-                          <span className="text-muted-foreground">Requested Date:</span>
-                          <span className="font-medium text-foreground">{request.requestedDate}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Clock className="h-4 w-4 text-primary" />
-                          <span className="text-muted-foreground">Requested Time:</span>
-                          <span className="font-medium text-foreground">{request.requestedTime}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <span className="text-muted-foreground">Treatment:</span>
-                          <span className="font-medium text-foreground">{request.treatment}</span>
-                        </div>
+                    <div className="flex-1 grid grid-cols-4 gap-4 items-center">
+                      <div>
+                        <p className="font-semibold text-foreground">{request.patient}</p>
                       </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Phone className="h-4 w-4" />
-                          <span>{request.phone}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <Mail className="h-4 w-4" />
-                          <span>{request.email}</span>
-                        </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <CalendarIcon className="h-4 w-4" />
+                        <span>{request.requestedDate}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        <span>{request.requestedTime}</span>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        <span>{request.duration}</span>
                       </div>
                     </div>
 
-                    {request.notes && (
-                      <div className="bg-muted/50 rounded-lg p-3">
-                        <p className="text-sm font-medium text-foreground mb-1">Patient Notes:</p>
-                        <p className="text-sm text-muted-foreground">{request.notes}</p>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => handleAccept(request.id)}
+                            className="h-9 w-9 text-green-600 hover:text-green-700 hover:bg-green-50"
+                          >
+                            <Check className="h-5 w-5" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Accept</TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => handleProposeTime(request)}
+                            className="h-9 w-9 hover:bg-muted"
+                          >
+                            <CalendarClock className="h-5 w-5" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Propose Time</TooltipContent>
+                      </Tooltip>
+
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => handleDecline(request.id)}
+                            className="h-9 w-9 text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <X className="h-5 w-5" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Decline</TooltipContent>
+                      </Tooltip>
+                    </div>
                   </div>
 
-                  <div className="flex flex-col gap-2 min-w-[140px]">
-                    <Button
-                      onClick={() => handleAccept(request.id)}
-                      className="w-full bg-green-600 hover:bg-green-700"
-                    >
-                      <Check className="h-4 w-4 mr-2" />
-                      Accept
-                    </Button>
-                    <Button
-                      onClick={() => handleProposeTime(request)}
-                      variant="outline"
-                      className="w-full"
-                    >
-                      <CalendarClock className="h-4 w-4 mr-2" />
-                      Propose Time
-                    </Button>
-                    <Button
-                      onClick={() => handleDecline(request.id)}
-                      variant="outline"
-                      className="w-full text-destructive hover:bg-destructive/10"
-                    >
-                      <X className="h-4 w-4 mr-2" />
-                      Decline
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                  {/* Expanded Details */}
+                  {isExpanded && (
+                    <div className="border-t border-border bg-muted/30 p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">Treatment</p>
+                            <p className="text-sm text-foreground">{request.treatment}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">Contact</p>
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2 text-sm text-foreground">
+                                <Phone className="h-3 w-3 text-muted-foreground" />
+                                <span>{request.phone}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm text-foreground">
+                                <Mail className="h-3 w-3 text-muted-foreground" />
+                                <span>{request.email}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {request.notes && (
+                          <div>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">Patient Notes</p>
+                            <p className="text-sm text-foreground">{request.notes}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -321,6 +390,7 @@ const Planning = () => {
         </DialogContent>
       </Dialog>
     </div>
+    </TooltipProvider>
   );
 };
 
