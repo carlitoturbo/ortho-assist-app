@@ -184,9 +184,32 @@ const Planning = () => {
     }
   };
 
-  const handleDecline = (id: number) => {
-    setRequests(requests.filter((r) => r.id !== id));
-    toast.error("Appointment request declined");
+  const handleDecline = async (id: number) => {
+    try {
+      const { data, error } = await supabase
+        .from("appointments")
+        .update({ status: "declined" })
+        .eq("id", id)
+        .select("id,status");
+
+      if (error) {
+        console.error("Error declining appointment:", error);
+        toast.error("Failed to decline appointment");
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        console.warn("No rows updated for appointment", { id });
+        toast.error("No appointment updated. Please try again.");
+        return;
+      }
+
+      setRequests((prev) => prev.filter((r) => r.id !== id));
+      toast.error("Appointment request declined");
+    } catch (error) {
+      console.error("Unexpected error declining appointment:", error);
+      toast.error("Failed to decline appointment");
+    }
   };
 
   const handleProposeTime = (request: AppointmentRequest) => {
