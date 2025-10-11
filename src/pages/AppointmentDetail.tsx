@@ -161,23 +161,28 @@ const AppointmentDetail = () => {
                       <div className="space-y-4">
                         <div>
                           <p className="text-sm font-medium text-muted-foreground mb-2">Reason for Visit</p>
-                          <p className="text-base text-foreground">
-                            Patient reported discomfort in the lower right molar area. Requesting a checkup to assess the condition and determine if further treatment is needed.
-                          </p>
+                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
+                            <li>Discomfort in lower right molar area</li>
+                            <li>Requesting checkup and assessment</li>
+                          </ul>
                         </div>
                         
                         <div>
                           <p className="text-sm font-medium text-muted-foreground mb-2">Medical History</p>
-                          <p className="text-base text-foreground">
-                            No known allergies. Previously had a root canal treatment 2 years ago. Regular dental checkups every 6 months.
-                          </p>
+                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
+                            <li>No known allergies</li>
+                            <li>Root canal treatment 2 years ago</li>
+                            <li>Regular checkups every 6 months</li>
+                          </ul>
                         </div>
 
                         <div>
                           <p className="text-sm font-medium text-muted-foreground mb-2">Additional Notes</p>
-                          <p className="text-base text-foreground">
-                            Patient prefers morning appointments. Slight anxiety about dental procedures, prefers detailed explanations before treatment.
-                          </p>
+                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
+                            <li>Prefers morning appointments</li>
+                            <li>Slight anxiety about dental procedures</li>
+                            <li>Prefers detailed explanations before treatment</li>
+                          </ul>
                         </div>
                       </div>
                     </CardContent>
