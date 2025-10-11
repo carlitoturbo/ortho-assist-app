@@ -5,12 +5,10 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
-  useSidebar,
 } from "@/components/ui/sidebar";
 
 const navItems = [
@@ -21,29 +19,19 @@ const navItems = [
 ];
 
 export function DentalSidebar() {
-  const { open } = useSidebar();
-
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b border-sidebar-border p-4">
-        {open && (
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary">
-              <span className="text-lg font-bold text-sidebar-primary-foreground">D</span>
-            </div>
-            <span className="text-lg font-semibold text-sidebar-foreground">DentalCare</span>
-          </div>
-        )}
-        {!open && (
+        <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary">
             <span className="text-lg font-bold text-sidebar-primary-foreground">D</span>
           </div>
-        )}
+          <span className="text-lg font-semibold text-sidebar-foreground">DentalCare</span>
+        </div>
       </SidebarHeader>
       
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => (
