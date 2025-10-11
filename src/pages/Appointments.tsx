@@ -223,8 +223,7 @@ const Appointments = () => {
               >
                 <CardContent className="p-4">
                   <div className="flex flex-col gap-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="space-y-3 flex-1 min-w-0">
+                    <div className="space-y-3 flex-1 min-w-0">
                         <div className="flex items-center gap-3">
                           <h3 className="text-lg font-semibold text-foreground">{apt.patient}</h3>
                           <Badge
@@ -273,16 +272,6 @@ const Appointments = () => {
                           </div>
                         </div>
                       </div>
-
-                      <div className="flex flex-col gap-2 flex-shrink-0">
-                        <Button variant="outline" size="sm" className="whitespace-nowrap">
-                          Edit
-                        </Button>
-                        <Button variant="outline" size="sm" className="whitespace-nowrap">
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
                   </div>
                 </CardContent>
               </Card>
