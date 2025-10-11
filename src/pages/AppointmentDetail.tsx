@@ -1,62 +1,87 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Phone, Mail, ArrowLeft, Clock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
+
+interface AppointmentData {
+  id: number;
+  appointment_date: string;
+  appointment_time: string;
+  treatment: string;
+  status: string;
+  duration_minutes: number;
+  notes: string | null;
+  patient?: {
+    first_name: string | null;
+    last_name: string | null;
+    phone: string | null;
+    mail: string | null;
+  };
+}
 
 const AppointmentDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [appointment, setAppointment] = useState<AppointmentData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data - in real app, fetch by ID
-  const appointments = [
-    {
-      id: 1,
-      date: "Today",
-      time: "14:00",
-      patient: "Emily Davis",
-      phone: "(555) 234-5678",
-      email: "emily.d@email.com",
-      treatment: "Checkup",
-      status: "pending",
-      duration: "30 min",
-    },
-    {
-      id: 2,
-      date: "Today",
-      time: "15:30",
-      patient: "James Wilson",
-      phone: "(555) 345-6789",
-      email: "james.w@email.com",
-      treatment: "Filling",
-      status: "confirmed",
-      duration: "45 min",
-    },
-    {
-      id: 3,
-      date: "Today",
-      time: "09:00",
-      patient: "Sarah Johnson",
-      phone: "(555) 111-2222",
-      email: "sarah.j@email.com",
-      treatment: "Cleaning",
-      status: "confirmed",
-      duration: "60 min",
-    },
-    {
-      id: 4,
-      date: "Today",
-      time: "11:00",
-      patient: "Robert Brown",
-      phone: "(555) 567-8901",
-      email: "robert.b@email.com",
-      treatment: "Root Canal",
-      status: "confirmed",
-      duration: "90 min",
-    },
-  ];
+  useEffect(() => {
+    const fetchAppointment = async () => {
+      if (!id) return;
+      
+      setIsLoading(true);
+      
+      try {
+        // Fetch appointment with patient data
+        const { data: appointmentData, error: appointmentError } = await supabase
+          .from("appointments")
+          .select(`
+            *,
+            patient:patients!appointments_patient_id_fkey (
+              first_name,
+              last_name,
+              phone,
+              mail
+            )
+          `)
+          .eq("id", Number(id))
+          .maybeSingle();
 
-  const appointment = appointments.find((apt) => apt.id === Number(id));
+        if (appointmentError) throw appointmentError;
+        
+        if (appointmentData) {
+          // Transform the nested patient object from array to single object
+          const transformedData = {
+            ...appointmentData,
+            patient: Array.isArray(appointmentData.patient) 
+              ? appointmentData.patient[0] 
+              : appointmentData.patient
+          };
+          setAppointment(transformedData as AppointmentData);
+        }
+      } catch (error) {
+        console.error("Error fetching appointment:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAppointment();
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading appointment details...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!appointment) {
     return (
@@ -91,7 +116,11 @@ const AppointmentDetail = () => {
             <div className="space-y-8">
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-2xl font-bold text-foreground">{appointment.patient}</h2>
+                  <h2 className="text-2xl font-bold text-foreground">
+                    {appointment.patient?.first_name && appointment.patient?.last_name
+                      ? `${appointment.patient.first_name} ${appointment.patient.last_name}`
+                      : "Unknown Patient"}
+                  </h2>
                   <Badge
                     variant={appointment.status === "confirmed" ? "default" : "secondary"}
                     className={
@@ -109,7 +138,9 @@ const AppointmentDetail = () => {
                     <Calendar className="h-5 w-5 text-primary mt-1" />
                     <div>
                       <p className="text-xs text-muted-foreground">Date</p>
-                      <p className="text-base font-semibold text-foreground">{appointment.date}</p>
+                      <p className="text-base font-semibold text-foreground">
+                        {format(new Date(appointment.appointment_date), "MMMM d, yyyy")}
+                      </p>
                     </div>
                   </div>
 
@@ -117,7 +148,9 @@ const AppointmentDetail = () => {
                     <Clock className="h-5 w-5 text-primary mt-1" />
                     <div>
                       <p className="text-xs text-muted-foreground">Time</p>
-                      <p className="text-base font-semibold text-foreground">{appointment.time}</p>
+                      <p className="text-base font-semibold text-foreground">
+                        {appointment.appointment_time.substring(0, 5)}
+                      </p>
                     </div>
                   </div>
 
@@ -125,7 +158,9 @@ const AppointmentDetail = () => {
                     <Phone className="h-5 w-5 text-primary mt-1" />
                     <div>
                       <p className="text-xs text-muted-foreground">Phone</p>
-                      <p className="text-base font-semibold text-foreground">{appointment.phone}</p>
+                      <p className="text-base font-semibold text-foreground">
+                        {appointment.patient?.phone || "N/A"}
+                      </p>
                     </div>
                   </div>
 
@@ -141,7 +176,9 @@ const AppointmentDetail = () => {
                     <Clock className="h-5 w-5 text-primary mt-1" />
                     <div>
                       <p className="text-xs text-muted-foreground">Duration</p>
-                      <p className="text-base font-semibold text-foreground">{appointment.duration}</p>
+                      <p className="text-base font-semibold text-foreground">
+                        {appointment.duration_minutes} min
+                      </p>
                     </div>
                   </div>
 
@@ -149,82 +186,19 @@ const AppointmentDetail = () => {
                     <Mail className="h-5 w-5 text-primary mt-1" />
                     <div>
                       <p className="text-xs text-muted-foreground">Email</p>
-                      <p className="text-base font-semibold text-foreground break-all">{appointment.email}</p>
+                      <p className="text-base font-semibold text-foreground break-all">
+                        {appointment.patient?.mail || "N/A"}
+                      </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-border">
-                  <div className="grid grid-cols-2 gap-8 divide-x divide-border">
-                    <div className="pr-8">
-                      <h3 className="text-lg font-semibold text-foreground mb-4">Executive Summary</h3>
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-2">Reason for Visit</p>
-                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
-                            <li>Discomfort in lower right molar area</li>
-                            <li>Requesting checkup and assessment</li>
-                          </ul>
-                        </div>
-                        
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-2">Medical History</p>
-                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
-                            <li>No known allergies</li>
-                            <li>Root canal treatment 2 years ago</li>
-                            <li>Regular checkups every 6 months</li>
-                          </ul>
-                        </div>
-
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-2">Additional Notes</p>
-                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
-                            <li>Prefers morning appointments</li>
-                            <li>Slight anxiety about dental procedures</li>
-                            <li>Prefers detailed explanations before treatment</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="pl-8">
-                      <h3 className="text-lg font-semibold text-foreground mb-4">Patient Information</h3>
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-2">Medical History</p>
-                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
-                            <li>Hypertension (controlled)</li>
-                            <li>Type 2 Diabetes</li>
-                          </ul>
-                        </div>
-
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-2">Current Medications</p>
-                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
-                            <li>Ibuprofen 400mg as needed</li>
-                            <li>Multivitamin daily</li>
-                          </ul>
-                        </div>
-                        
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-2">Allergies</p>
-                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
-                            <li>None reported</li>
-                          </ul>
-                        </div>
-
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground mb-2">Previous Treatments</p>
-                          <ul className="list-disc list-inside text-base text-foreground space-y-1">
-                            <li>Root canal (2 years ago)</li>
-                            <li>Teeth whitening (1 year ago)</li>
-                            <li>Wisdom teeth extraction (5 years ago)</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
+                {appointment.notes && (
+                  <div className="pt-6 border-t border-border">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Notes</h3>
+                    <p className="text-base text-foreground whitespace-pre-wrap">{appointment.notes}</p>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </CardContent>
