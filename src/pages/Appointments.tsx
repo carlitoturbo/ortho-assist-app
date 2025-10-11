@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { AppointmentsDayCalendar } from "@/components/AppointmentsDayCalendar";
 import { useLocation, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { format, isToday, isTomorrow } from "date-fns";
 
 interface AppointmentType {
   id: number;
@@ -26,98 +28,64 @@ const Appointments = () => {
     location.state?.highlightId || null
   );
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  const [appointments, setAppointments] = useState<AppointmentType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const appointmentRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
-  const appointments: AppointmentType[] = [
-    {
-      id: 1,
-      date: "Today",
-      time: "14:00",
-      patient: "Emily Davis",
-      phone: "(555) 234-5678",
-      email: "emily.d@email.com",
-      treatment: "Checkup",
-      status: "pending",
-      duration: "30 min",
-    },
-    {
-      id: 2,
-      date: "Today",
-      time: "15:30",
-      patient: "James Wilson",
-      phone: "(555) 345-6789",
-      email: "james.w@email.com",
-      treatment: "Filling",
-      status: "confirmed",
-      duration: "45 min",
-    },
-    {
-      id: 3,
-      date: "Today",
-      time: "09:00",
-      patient: "Sarah Johnson",
-      phone: "(555) 111-2222",
-      email: "sarah.j@email.com",
-      treatment: "Cleaning",
-      status: "confirmed",
-      duration: "60 min",
-    },
-    {
-      id: 4,
-      date: "Today",
-      time: "11:00",
-      patient: "Robert Brown",
-      phone: "(555) 567-8901",
-      email: "robert.b@email.com",
-      treatment: "Root Canal",
-      status: "confirmed",
-      duration: "90 min",
-    },
-    {
-      id: 5,
-      date: "Tomorrow",
-      time: "10:30",
-      patient: "Maria Garcia",
-      phone: "(555) 678-9012",
-      email: "maria.g@email.com",
-      treatment: "Crown Fitting",
-      status: "pending",
-      duration: "60 min",
-    },
-    {
-      id: 6,
-      date: "Tomorrow",
-      time: "14:00",
-      patient: "David Lee",
-      phone: "(555) 789-0123",
-      email: "david.l@email.com",
-      treatment: "Extraction",
-      status: "confirmed",
-      duration: "45 min",
-    },
-    {
-      id: 7,
-      date: "15/03/2025",
-      time: "09:30",
-      patient: "Jennifer Taylor",
-      phone: "(555) 890-1234",
-      email: "jennifer.t@email.com",
-      treatment: "Crown",
-      status: "confirmed",
-      duration: "75 min",
-    },
-    {
-      id: 8,
-      date: "15/03/2025",
-      time: "13:00",
-      patient: "Michael Anderson",
-      phone: "(555) 901-2345",
-      email: "michael.a@email.com",
-      treatment: "Cleaning",
-      status: "pending",
-      duration: "45 min",
-    },
-  ];
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  const fetchAppointments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select(`
+          *,
+          patients (
+            first_name,
+            last_name,
+            phone,
+            mail
+          )
+        `)
+        .order("appointment_date", { ascending: true })
+        .order("appointment_time", { ascending: true });
+
+      if (error) throw error;
+
+      const formattedAppointments: AppointmentType[] = data.map((apt: any) => {
+        const appointmentDate = new Date(apt.appointment_date);
+        let dateDisplay: string;
+
+        if (isToday(appointmentDate)) {
+          dateDisplay = "Today";
+        } else if (isTomorrow(appointmentDate)) {
+          dateDisplay = "Tomorrow";
+        } else {
+          dateDisplay = format(appointmentDate, "dd/MM/yyyy");
+        }
+
+        return {
+          id: apt.id,
+          date: dateDisplay,
+          time: apt.appointment_time.substring(0, 5), // Format HH:MM
+          patient: `${apt.patients.first_name} ${apt.patients.last_name}`,
+          phone: apt.patients.phone || "N/A",
+          email: apt.patients.mail || "N/A",
+          treatment: apt.treatment,
+          status: apt.status,
+          duration: `${apt.duration_minutes} min`,
+        };
+      });
+
+      setAppointments(formattedAppointments);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Get unique days
   const uniqueDays = Array.from(new Set(appointments.map((apt) => apt.date)));
@@ -161,6 +129,14 @@ const Appointments = () => {
   };
 
   const dayAppointments = appointments.filter((apt) => apt.date === selectedDay);
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <p className="text-muted-foreground">Loading appointments...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
