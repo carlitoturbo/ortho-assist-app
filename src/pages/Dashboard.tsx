@@ -53,18 +53,8 @@ const Dashboard = () => {
     value: "3",
     icon: Clock,
     color: "text-accent"
-  }, {
-    label: "Total Patients",
-    value: "247",
-    icon: Users,
-    color: "text-muted-foreground"
-  }, {
-    label: "This Month",
-    value: "+15%",
-    icon: TrendingUp,
-    color: "text-green-600"
   }];
-  return <div className="h-full overflow-auto space-y-6">
+  return <div className="h-full overflow-hidden space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
         <p className="text-muted-foreground mt-1">Welcome back! Here's your overview for today.</p>
