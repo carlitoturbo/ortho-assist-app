@@ -30,11 +30,16 @@ export function DentalSidebar() {
                     <NavLink
                       to={item.url}
                       end={item.url === "/"}
-                      className={({ isActive }) =>
-                        isActive
-                          ? "bg-primary text-primary-foreground font-medium rounded-md"
-                          : "hover:bg-sidebar-accent/50"
-                      }
+                      className={({ isActive }) => {
+                        // Check if current path starts with the nav item url (for nested routes)
+                        const currentPath = window.location.pathname;
+                        const isActiveOrParent = isActive || 
+                          (item.url !== "/" && currentPath.startsWith(item.url));
+                        
+                        return isActiveOrParent
+                          ? "bg-primary/10 text-primary font-medium border-l-4 border-primary"
+                          : "hover:bg-sidebar-accent/50";
+                      }}
                     >
                       <item.icon className="h-5 w-5" />
                       <span>{item.title}</span>
