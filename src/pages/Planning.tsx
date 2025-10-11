@@ -37,6 +37,21 @@ import {
 } from "@/components/ui/tooltip";
 import { DayCalendarView } from "@/components/DayCalendarView";
 
+// Mock data for other appointments on the same days
+const mockAppointments = {
+  "Mar 15, 2025": [
+    { time: "09:00 AM", duration: "45 min", patientName: "John Doe", treatment: "Filling", status: "confirmed" as const },
+    { time: "11:30 AM", duration: "30 min", patientName: "Jane Smith", treatment: "Checkup", status: "pending" as const },
+  ],
+  "Mar 16, 2025": [
+    { time: "10:00 AM", duration: "60 min", patientName: "Bob Wilson", treatment: "Cleaning", status: "confirmed" as const },
+    { time: "03:30 PM", duration: "30 min", patientName: "Alice Brown", treatment: "Consultation", status: "pending" as const },
+  ],
+  "Mar 14, 2025": [
+    { time: "08:00 AM", duration: "90 min", patientName: "Chris Lee", treatment: "Root Canal", status: "confirmed" as const },
+  ],
+};
+
 interface AppointmentRequest {
   id: number;
   patient: string;
@@ -313,6 +328,7 @@ const Planning = () => {
                             duration={request.duration}
                             patientName={request.patient}
                             treatment={request.treatment}
+                            otherAppointments={mockAppointments[request.requestedDate as keyof typeof mockAppointments] || []}
                           />
                         </div>
                       </div>

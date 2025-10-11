@@ -1,12 +1,21 @@
 import { Clock } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+interface Appointment {
+  time: string;
+  duration: string;
+  patientName: string;
+  treatment: string;
+  status: "current" | "confirmed" | "pending";
+}
+
 interface DayCalendarViewProps {
   date: string;
   time: string;
   duration: string;
   patientName: string;
   treatment: string;
+  otherAppointments?: Appointment[];
 }
 
 const parseTime = (timeStr: string): number => {
@@ -28,14 +37,40 @@ const parseDuration = (durationStr: string): number => {
   return minutes / 60;
 };
 
-export const DayCalendarView = ({ date, time, duration, patientName, treatment }: DayCalendarViewProps) => {
+export const DayCalendarView = ({ date, time, duration, patientName, treatment, otherAppointments = [] }: DayCalendarViewProps) => {
+  // Combine current appointment with others
+  const allAppointments: Appointment[] = [
+    { time, duration, patientName, treatment, status: "current" },
+    ...otherAppointments
+  ];
+  
   const appointmentStartHour = parseTime(time);
   const durationHours = parseDuration(duration);
   
-  // Show 1 hour before and 2 hours after the appointment
-  const startHour = Math.max(0, Math.floor(appointmentStartHour) - 1);
-  const endHour = Math.min(23, Math.ceil(appointmentStartHour + durationHours) + 2);
+  // Calculate time range to show
+  const allStartTimes = allAppointments.map(apt => parseTime(apt.time));
+  const allEndTimes = allAppointments.map((apt, idx) => parseTime(apt.time) + parseDuration(apt.duration));
+  const earliestStart = Math.min(...allStartTimes);
+  const latestEnd = Math.max(...allEndTimes);
+  
+  // Show 1 hour before earliest and 2 hours after latest
+  const startHour = Math.max(0, Math.floor(earliestStart) - 1);
+  const endHour = Math.min(23, Math.ceil(latestEnd) + 2);
   const hours = Array.from({ length: endHour - startHour + 1 }, (_, i) => i + startHour);
+  
+  // Detect overlapping appointments for each hour slot
+  const getAppointmentsInSlot = (hour: number) => {
+    return allAppointments.map((apt, index) => {
+      const aptStart = parseTime(apt.time);
+      const aptDuration = parseDuration(apt.duration);
+      const aptEnd = aptStart + aptDuration;
+      
+      if (aptStart < hour + 1 && aptEnd > hour) {
+        return { ...apt, index, start: aptStart, duration: aptDuration };
+      }
+      return null;
+    }).filter(Boolean);
+  };
   
   return (
     <div className="space-y-4">
@@ -52,7 +87,8 @@ export const DayCalendarView = ({ date, time, duration, patientName, treatment }
           {hours.map((hour) => {
             const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
             const period = hour >= 12 ? "PM" : "AM";
-            const isAppointmentSlot = appointmentStartHour >= hour && appointmentStartHour < hour + 1;
+            const appointmentsInSlot = getAppointmentsInSlot(hour);
+            const overlappingCount = appointmentsInSlot.length;
             
             return (
               <div
@@ -69,27 +105,61 @@ export const DayCalendarView = ({ date, time, duration, patientName, treatment }
                 </div>
                 
                 <div className="flex-1 relative">
-                  {isAppointmentSlot && (
-                    <div
-                      className="absolute inset-x-2 bg-primary/10 border-l-4 border-primary rounded-md p-2 z-10"
-                      style={{
-                        top: `${((appointmentStartHour - hour) * 100)}%`,
-                        height: `${durationHours * 64}px`,
-                      }}
-                    >
-                      <div className="flex flex-col h-full">
-                        <p className="text-sm font-semibold text-foreground line-clamp-1">
-                          {patientName}
-                        </p>
-                        <p className="text-xs text-muted-foreground line-clamp-1">
-                          {treatment}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-auto">
-                          {time} • {duration}
-                        </p>
+                  {appointmentsInSlot.map((apt: any, idx: number) => {
+                    const isFirst = apt.start >= hour && apt.start < hour + 1;
+                    
+                    if (!isFirst) return null;
+                    
+                    const widthPercent = overlappingCount > 1 ? 100 / overlappingCount : 100;
+                    const leftPercent = idx * widthPercent;
+                    
+                    let bgClass = "bg-gray-200 dark:bg-gray-700";
+                    let borderClass = "border-gray-400 dark:border-gray-500";
+                    let textClass = "text-foreground";
+                    let patternClass = "";
+                    
+                    if (apt.status === "current") {
+                      bgClass = "bg-blue-400 dark:bg-blue-500";
+                      borderClass = "border-blue-600 dark:border-blue-700";
+                      textClass = "text-white dark:text-white";
+                    } else if (apt.status === "confirmed") {
+                      bgClass = "bg-blue-800 dark:bg-blue-900";
+                      borderClass = "border-blue-900 dark:border-blue-950";
+                      textClass = "text-white dark:text-white";
+                    } else if (apt.status === "pending") {
+                      patternClass = "striped-background";
+                    }
+                    
+                    return (
+                      <div
+                        key={`${apt.index}-${hour}`}
+                        className={cn(
+                          "absolute border-l-4 rounded-md p-2 z-10",
+                          bgClass,
+                          borderClass,
+                          patternClass
+                        )}
+                        style={{
+                          top: `${((apt.start - hour) * 100)}%`,
+                          height: `${apt.duration * 64}px`,
+                          left: `${leftPercent}%`,
+                          width: `calc(${widthPercent}% - 8px)`,
+                        }}
+                      >
+                        <div className="flex flex-col h-full">
+                          <p className={cn("text-sm font-semibold line-clamp-1", textClass)}>
+                            {apt.patientName}
+                          </p>
+                          <p className={cn("text-xs line-clamp-1", textClass, "opacity-90")}>
+                            {apt.treatment}
+                          </p>
+                          <p className={cn("text-xs mt-auto", textClass, "opacity-80")}>
+                            {apt.time} • {apt.duration}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })}
                 </div>
               </div>
             );
