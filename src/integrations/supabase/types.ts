@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          appointment_date: string
+          appointment_time: string
+          created_at: string
+          duration_minutes: number
+          id: number
+          notes: string | null
+          patient_id: number
+          status: string
+          treatment: string
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time: string
+          created_at?: string
+          duration_minutes: number
+          id?: never
+          notes?: string | null
+          patient_id: number
+          status?: string
+          treatment: string
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string
+          created_at?: string
+          duration_minutes?: number
+          id?: never
+          notes?: string | null
+          patient_id?: number
+          status?: string
+          treatment?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       patients: {
         Row: {
           created_at: string
