@@ -29,9 +29,13 @@ const parseDuration = (durationStr: string): number => {
 };
 
 export const DayCalendarView = ({ date, time, duration, patientName, treatment }: DayCalendarViewProps) => {
-  const hours = Array.from({ length: 10 }, (_, i) => i + 8); // 8 AM to 5 PM
-  const startHour = parseTime(time);
+  const appointmentStartHour = parseTime(time);
   const durationHours = parseDuration(duration);
+  
+  // Show 1 hour before and 2 hours after the appointment
+  const startHour = Math.max(0, Math.floor(appointmentStartHour) - 1);
+  const endHour = Math.min(23, Math.ceil(appointmentStartHour + durationHours) + 2);
+  const hours = Array.from({ length: endHour - startHour + 1 }, (_, i) => i + startHour);
   
   return (
     <div className="space-y-4">
@@ -48,7 +52,7 @@ export const DayCalendarView = ({ date, time, duration, patientName, treatment }
           {hours.map((hour) => {
             const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
             const period = hour >= 12 ? "PM" : "AM";
-            const isAppointmentSlot = startHour >= hour && startHour < hour + 1;
+            const isAppointmentSlot = appointmentStartHour >= hour && appointmentStartHour < hour + 1;
             
             return (
               <div
@@ -69,7 +73,7 @@ export const DayCalendarView = ({ date, time, duration, patientName, treatment }
                     <div
                       className="absolute inset-x-2 bg-primary/10 border-l-4 border-primary rounded-md p-2 z-10"
                       style={{
-                        top: `${((startHour - hour) * 100)}%`,
+                        top: `${((appointmentStartHour - hour) * 100)}%`,
                         height: `${durationHours * 64}px`,
                       }}
                     >
