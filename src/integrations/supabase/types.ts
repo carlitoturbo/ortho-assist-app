@@ -31,7 +31,7 @@ export type Database = {
           appointment_time: string
           created_at?: string
           duration_minutes: number
-          id?: never
+          id?: number
           notes?: string | null
           patient_id: number
           status?: string
@@ -42,7 +42,7 @@ export type Database = {
           appointment_time?: string
           created_at?: string
           duration_minutes?: number
-          id?: never
+          id?: number
           notes?: string | null
           patient_id?: number
           status?: string
@@ -60,6 +60,7 @@ export type Database = {
       }
       patients: {
         Row: {
+          birth_date: string | null
           created_at: string
           edited_at: string | null
           ensurance_number: string | null
@@ -70,6 +71,7 @@ export type Database = {
           phone: string | null
         }
         Insert: {
+          birth_date?: string | null
           created_at?: string
           edited_at?: string | null
           ensurance_number?: string | null
@@ -80,6 +82,7 @@ export type Database = {
           phone?: string | null
         }
         Update: {
+          birth_date?: string | null
           created_at?: string
           edited_at?: string | null
           ensurance_number?: string | null
