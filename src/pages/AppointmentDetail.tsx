@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, Phone, Mail, ArrowLeft, Clock } from "lucide-react";
+import { Calendar, Phone, Mail, ArrowLeft, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 
@@ -21,6 +21,14 @@ interface AppointmentData {
     phone: string | null;
     mail: string | null;
   };
+  patient_id: number;
+}
+
+interface Treatment {
+  id: string;
+  treatment: string;
+  created_at: string;
+  patient_id: number;
 }
 
 const AppointmentDetail = () => {
@@ -28,6 +36,8 @@ const AppointmentDetail = () => {
   const navigate = useNavigate();
   const [appointment, setAppointment] = useState<AppointmentData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [treatments, setTreatments] = useState<Treatment[]>([]);
+  const [showAllTreatments, setShowAllTreatments] = useState(false);
 
   useEffect(() => {
     const fetchAppointment = async () => {
@@ -62,6 +72,18 @@ const AppointmentDetail = () => {
               : appointmentData.patient
           };
           setAppointment(transformedData as AppointmentData);
+
+          // Fetch treatments for this patient
+          const { data: treatmentsData, error: treatmentsError } = await supabase
+            .from("treatments")
+            .select("*")
+            .eq("patient_id", appointmentData.patient_id)
+            .order("created_at", { ascending: false });
+
+          if (treatmentsError) throw treatmentsError;
+          if (treatmentsData) {
+            setTreatments(treatmentsData);
+          }
         }
       } catch (error) {
         console.error("Error fetching appointment:", error);
@@ -72,6 +94,8 @@ const AppointmentDetail = () => {
 
     fetchAppointment();
   }, [id]);
+
+  const displayedTreatments = showAllTreatments ? treatments : treatments.slice(0, 3);
 
   if (isLoading) {
     return (
@@ -193,12 +217,60 @@ const AppointmentDetail = () => {
                   </div>
                 </div>
 
-                {appointment.notes && (
-                  <div className="pt-6 border-t border-border">
-                    <h3 className="text-lg font-semibold text-foreground mb-4">Notes</h3>
-                    <p className="text-base text-foreground whitespace-pre-wrap">{appointment.notes}</p>
+                <div className="pt-6 border-t border-border">
+                  <div className="grid grid-cols-2 gap-8 divide-x divide-border">
+                    {appointment.notes && (
+                      <div className="pr-8">
+                        <h3 className="text-lg font-semibold text-foreground mb-4">Notes</h3>
+                        <p className="text-base text-foreground whitespace-pre-wrap">{appointment.notes}</p>
+                      </div>
+                    )}
+                    
+                    <div className={appointment.notes ? "pl-8" : ""}>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-foreground">Previous Treatments</h3>
+                        {treatments.length > 3 && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowAllTreatments(!showAllTreatments)}
+                            className="text-primary hover:text-primary"
+                          >
+                            {showAllTreatments ? (
+                              <>
+                                <ChevronUp className="h-4 w-4 mr-1" />
+                                Show Less
+                              </>
+                            ) : (
+                              <>
+                                <ChevronDown className="h-4 w-4 mr-1" />
+                                Show All ({treatments.length})
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
+                      
+                      {treatments.length === 0 ? (
+                        <p className="text-muted-foreground text-sm">No previous treatments recorded.</p>
+                      ) : (
+                        <ul className="space-y-3">
+                          {displayedTreatments.map((treatment) => (
+                            <li key={treatment.id} className="flex items-start gap-3">
+                              <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
+                              <div className="flex-1">
+                                <p className="text-base text-foreground">{treatment.treatment}</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {format(new Date(treatment.created_at), "MMMM d, yyyy")}
+                                </p>
+                              </div>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </CardContent>
