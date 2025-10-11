@@ -19,8 +19,8 @@ const navItems = [
 
 export function DentalSidebar() {
   return (
-    <Sidebar collapsible="icon" className="border-r">
-      <SidebarContent className="pt-4">
+    <Sidebar collapsible="icon" className="border-r flex flex-col">
+      <SidebarContent className="py-4">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
