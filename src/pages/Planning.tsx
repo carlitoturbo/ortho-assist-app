@@ -180,8 +180,8 @@ const Planning = () => {
 
   return (
     <TooltipProvider>
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="h-full flex flex-col overflow-hidden">
+      <div className="flex items-center justify-between flex-shrink-0">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Appointment Planning</h1>
           <p className="text-muted-foreground mt-1">
@@ -194,7 +194,7 @@ const Planning = () => {
       </div>
 
       {pendingRequests.length === 0 ? (
-        <Card>
+        <Card className="mt-6">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <CalendarClock className="h-16 w-16 text-muted-foreground mb-4" />
             <h3 className="text-xl font-semibold text-foreground mb-2">No pending requests</h3>
@@ -202,7 +202,7 @@ const Planning = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-2">
+        <div className="mt-6 overflow-y-auto flex-1 space-y-2 pr-2">
           {pendingRequests.map((request) => {
             const isExpanded = expandedRows[request.id];
             
