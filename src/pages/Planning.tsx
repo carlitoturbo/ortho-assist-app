@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar as CalendarIcon, Clock, Phone, Mail, X, Check, CalendarClock, ChevronDown, ChevronRight } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Phone, Mail, X, Check, CalendarClock, ChevronDown, ChevronRight, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -21,7 +22,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { format } from "date-fns";
+import { format, isAfter, startOfToday, parse } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -62,7 +64,8 @@ interface AppointmentRequest {
   requestedTime: string;
   duration: string;
   notes?: string;
-  status: "pending" | "accepted" | "declined";
+  status: string;
+  appointmentDate: Date;
 }
 
 interface ExpandedState {
@@ -70,74 +73,67 @@ interface ExpandedState {
 }
 
 const Planning = () => {
-  const [requests, setRequests] = useState<AppointmentRequest[]>([
-    {
-      id: 1,
-      patient: "Sarah Johnson",
-      phone: "(555) 234-5678",
-      email: "sarah.j@email.com",
-      treatment: "Cleaning",
-      requestedDate: "15/03/2025",
-      requestedTime: "10:00",
-      duration: "60 min",
-      notes: "First visit, mild anxiety about dental procedures",
-      status: "pending",
-    },
-    {
-      id: 2,
-      patient: "Michael Chen",
-      phone: "(555) 345-6789",
-      email: "michael.c@email.com",
-      treatment: "Root Canal",
-      requestedDate: "16/03/2025",
-      requestedTime: "14:00",
-      duration: "90 min",
-      notes: "Experiencing pain in lower right molar",
-      status: "pending",
-    },
-    {
-      id: 3,
-      patient: "Emily Davis",
-      phone: "(555) 456-7890",
-      email: "emily.d@email.com",
-      treatment: "Checkup",
-      requestedDate: "14/03/2025",
-      requestedTime: "09:00",
-      duration: "30 min",
-      status: "pending",
-    },
-    {
-      id: 4,
-      patient: "James Wilson",
-      phone: "(555) 567-8901",
-      email: "james.w@email.com",
-      treatment: "Filling",
-      requestedDate: "17/03/2025",
-      requestedTime: "11:30",
-      duration: "45 min",
-      notes: "Cavity detected during last checkup",
-      status: "pending",
-    },
-    {
-      id: 5,
-      patient: "Lisa Anderson",
-      phone: "(555) 678-9012",
-      email: "lisa.a@email.com",
-      treatment: "Whitening",
-      requestedDate: "18/03/2025",
-      requestedTime: "15:00",
-      duration: "60 min",
-      status: "pending",
-    },
-  ]);
+  const [requests, setRequests] = useState<AppointmentRequest[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterDate, setFilterDate] = useState<Date>();
 
   const [expandedRows, setExpandedRows] = useState<ExpandedState>({});
-
   const [proposeDialogOpen, setProposeDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<AppointmentRequest | null>(null);
   const [proposedDate, setProposedDate] = useState<Date>();
   const [proposedTime, setProposedTime] = useState<string>("");
   const [proposalNotes, setProposalNotes] = useState<string>("");
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  const fetchAppointments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select(`
+          *,
+          patients (
+            first_name,
+            last_name,
+            phone,
+            mail
+          )
+        `)
+        .eq("status", "pending")
+        .gte("appointment_date", format(startOfToday(), "yyyy-MM-dd"))
+        .order("appointment_date", { ascending: true })
+        .order("appointment_time", { ascending: true });
+
+      if (error) throw error;
+
+      const formattedAppointments: AppointmentRequest[] = data.map((apt: any) => {
+        const appointmentDate = new Date(apt.appointment_date);
+        return {
+          id: apt.id,
+          patient: `${apt.patients.first_name} ${apt.patients.last_name}`,
+          phone: apt.patients.phone || "N/A",
+          email: apt.patients.mail || "N/A",
+          treatment: apt.treatment,
+          requestedDate: format(appointmentDate, "dd/MM/yyyy"),
+          requestedTime: apt.appointment_time.substring(0, 5),
+          duration: `${apt.duration_minutes} min`,
+          notes: apt.notes,
+          status: apt.status,
+          appointmentDate,
+        };
+      });
+
+      setRequests(formattedAppointments);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      toast.error("Failed to load appointments");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleAccept = (id: number) => {
     setRequests(requests.filter((r) => r.id !== id));
@@ -176,34 +172,101 @@ const Planning = () => {
     }));
   };
 
-  const pendingRequests = requests.filter((r) => r.status === "pending");
+  const filteredRequests = requests.filter((request) => {
+    const matchesSearch = request.patient.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesDate = !filterDate || format(request.appointmentDate, "yyyy-MM-dd") === format(filterDate, "yyyy-MM-dd");
+    return matchesSearch && matchesDate;
+  });
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <p className="text-muted-foreground">Loading appointments...</p>
+      </div>
+    );
+  }
 
   return (
     <TooltipProvider>
     <div className="h-full flex flex-col overflow-hidden">
-      <div className="flex items-center justify-between flex-shrink-0">
+      <div className="flex items-center justify-between mb-6 flex-shrink-0">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Appointment Planning</h1>
           <p className="text-muted-foreground mt-1">
             Review and manage incoming appointment requests from patients.
           </p>
         </div>
-        <Badge variant="secondary" className="text-lg px-4 py-2">
-          {pendingRequests.length} Pending
-        </Badge>
+        <div className="flex items-center gap-3">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "justify-start text-left font-normal",
+                  !filterDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {filterDate ? format(filterDate, "dd/MM/yyyy") : "Filter by date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="single"
+                selected={filterDate}
+                onSelect={setFilterDate}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+              {filterDate && (
+                <div className="p-3 border-t border-border">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setFilterDate(undefined)}
+                  >
+                    Clear Filter
+                  </Button>
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
+          <Badge variant="secondary" className="text-lg px-4 py-2">
+            {filteredRequests.length} Pending
+          </Badge>
+        </div>
       </div>
 
-      {pendingRequests.length === 0 ? (
-        <Card className="mt-6">
+      <div className="relative mb-6 flex-shrink-0">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Search patients..."
+          className="pl-9"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      {filteredRequests.length === 0 ? (
+        <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
             <CalendarClock className="h-16 w-16 text-muted-foreground mb-4" />
-            <h3 className="text-xl font-semibold text-foreground mb-2">No pending requests</h3>
-            <p className="text-muted-foreground">All appointment requests have been processed</p>
+            <h3 className="text-xl font-semibold text-foreground mb-2">
+              {requests.length === 0 ? "No pending requests" : "No matching appointments"}
+            </h3>
+            <p className="text-muted-foreground">
+              {requests.length === 0 
+                ? "All appointment requests have been processed" 
+                : searchQuery 
+                ? "Try adjusting your search criteria"
+                : "No appointments match the selected date"}
+            </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="mt-6 overflow-auto flex-1 space-y-2 pr-2">
-          {pendingRequests.map((request) => {
+        <div className="overflow-auto flex-1 space-y-2 pr-2">
+          {filteredRequests.map((request) => {
             const isExpanded = expandedRows[request.id];
             
             return (
