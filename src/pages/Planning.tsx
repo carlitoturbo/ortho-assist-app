@@ -196,56 +196,56 @@ const Planning = () => {
             Review and manage incoming appointment requests from patients.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "justify-start text-left font-normal",
-                  !filterDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {filterDate ? format(filterDate, "dd/MM/yyyy") : "Filter by date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
-              <Calendar
-                mode="single"
-                selected={filterDate}
-                onSelect={setFilterDate}
-                initialFocus
-                className={cn("p-3 pointer-events-auto")}
-              />
-              {filterDate && (
-                <div className="p-3 border-t border-border">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => setFilterDate(undefined)}
-                  >
-                    Clear Filter
-                  </Button>
-                </div>
-              )}
-            </PopoverContent>
-          </Popover>
-          <Badge variant="secondary" className="text-lg px-4 py-2">
-            {filteredRequests.length} Pending
-          </Badge>
-        </div>
+        <Badge variant="secondary" className="text-lg px-4 py-2">
+          {filteredRequests.length} Pending
+        </Badge>
       </div>
 
-      <div className="relative mb-6 flex-shrink-0">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Search patients..."
-          className="pl-9"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      <div className="flex items-center gap-3 mb-6 flex-shrink-0">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search patients..."
+            className="pl-9"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "justify-start text-left font-normal whitespace-nowrap",
+                !filterDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {filterDate ? format(filterDate, "dd/MM/yyyy") : "Filter by date"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="end">
+            <Calendar
+              mode="single"
+              selected={filterDate}
+              onSelect={setFilterDate}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+            {filterDate && (
+              <div className="p-3 border-t border-border">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setFilterDate(undefined)}
+                >
+                  Clear Filter
+                </Button>
+              </div>
+            )}
+          </PopoverContent>
+        </Popover>
       </div>
 
       {filteredRequests.length === 0 ? (
