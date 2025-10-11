@@ -91,13 +91,13 @@ const AppointmentDetail = () => {
             <div className="space-y-8">
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-3xl font-bold text-foreground">{appointment.patient}</h2>
+                  <h2 className="text-2xl font-bold text-foreground">{appointment.patient}</h2>
                   <Badge
                     variant={appointment.status === "confirmed" ? "default" : "secondary"}
                     className={
                       appointment.status === "confirmed"
-                        ? "bg-green-100 text-green-800 hover:bg-green-100 text-lg px-4 py-2"
-                        : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 text-lg px-4 py-2"
+                        ? "bg-green-100 text-green-800 hover:bg-green-100 px-3 py-1"
+                        : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 px-3 py-1"
                     }
                   >
                     {appointment.status}
@@ -106,50 +106,50 @@ const AppointmentDetail = () => {
 
                 <div className="grid grid-cols-3 gap-x-12 gap-y-6">
                   <div className="flex items-start gap-4">
-                    <Calendar className="h-6 w-6 text-primary mt-1" />
+                    <Calendar className="h-5 w-5 text-primary mt-1" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Date</p>
-                      <p className="text-xl font-semibold text-foreground">{appointment.date}</p>
+                      <p className="text-xs text-muted-foreground">Date</p>
+                      <p className="text-base font-semibold text-foreground">{appointment.date}</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <Clock className="h-6 w-6 text-primary mt-1" />
+                    <Clock className="h-5 w-5 text-primary mt-1" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Time</p>
-                      <p className="text-xl font-semibold text-foreground">{appointment.time}</p>
+                      <p className="text-xs text-muted-foreground">Time</p>
+                      <p className="text-base font-semibold text-foreground">{appointment.time}</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <Clock className="h-6 w-6 text-primary mt-1" />
+                    <Clock className="h-5 w-5 text-primary mt-1" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Duration</p>
-                      <p className="text-xl font-semibold text-foreground">{appointment.duration}</p>
+                      <p className="text-xs text-muted-foreground">Duration</p>
+                      <p className="text-base font-semibold text-foreground">{appointment.duration}</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <div className="h-6 w-6 mt-1" />
+                    <div className="h-5 w-5 mt-1" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Treatment</p>
-                      <p className="text-xl font-semibold text-foreground">{appointment.treatment}</p>
+                      <p className="text-xs text-muted-foreground">Treatment</p>
+                      <p className="text-base font-semibold text-foreground">{appointment.treatment}</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <Phone className="h-6 w-6 text-primary mt-1" />
+                    <Phone className="h-5 w-5 text-primary mt-1" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Phone Number</p>
-                      <p className="text-xl font-semibold text-foreground">{appointment.phone}</p>
+                      <p className="text-xs text-muted-foreground">Phone Number</p>
+                      <p className="text-base font-semibold text-foreground">{appointment.phone}</p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-4">
-                    <Mail className="h-6 w-6 text-primary mt-1" />
+                    <Mail className="h-5 w-5 text-primary mt-1" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Email Address</p>
-                      <p className="text-xl font-semibold text-foreground break-all">{appointment.email}</p>
+                      <p className="text-xs text-muted-foreground">Email Address</p>
+                      <p className="text-base font-semibold text-foreground break-all">{appointment.email}</p>
                     </div>
                   </div>
                 </div>
