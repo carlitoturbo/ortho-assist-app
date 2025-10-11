@@ -153,6 +153,36 @@ const AppointmentDetail = () => {
                     </div>
                   </div>
                 </div>
+
+                <div className="pt-6 border-t border-border">
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Executive Summary</h3>
+                  <Card className="bg-muted/30">
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground mb-2">Reason for Visit</p>
+                          <p className="text-base text-foreground">
+                            Patient reported discomfort in the lower right molar area. Requesting a checkup to assess the condition and determine if further treatment is needed.
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground mb-2">Medical History</p>
+                          <p className="text-base text-foreground">
+                            No known allergies. Previously had a root canal treatment 2 years ago. Regular dental checkups every 6 months.
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground mb-2">Additional Notes</p>
+                          <p className="text-base text-foreground">
+                            Patient prefers morning appointments. Slight anxiety about dental procedures, prefers detailed explanations before treatment.
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             </div>
           </CardContent>
