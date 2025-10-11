@@ -96,7 +96,8 @@ const Appointments = () => {
     if (highlightedId && appointmentRefs.current[highlightedId]) {
       appointmentRefs.current[highlightedId]?.scrollIntoView({
         behavior: "smooth",
-        block: "center",
+        block: "nearest",
+        inline: "nearest",
       });
     }
   }, [highlightedId]);
