@@ -208,7 +208,7 @@ const Appointments = () => {
 
       <div className="flex gap-6 flex-1 overflow-hidden">
         {/* Left Side - Appointments List */}
-        <div className="flex-1 overflow-y-auto space-y-3 pr-2 p-1">
+        <div className="flex-1 overflow-auto space-y-3 pr-2 p-1">
           {dayAppointments.map((apt) => {
             const isHighlighted = highlightedId === apt.id;
             

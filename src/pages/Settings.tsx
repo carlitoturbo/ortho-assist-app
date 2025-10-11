@@ -12,7 +12,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="h-full overflow-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-foreground">Settings</h1>
         <p className="text-muted-foreground mt-1">Manage your clinic preferences and notifications.</p>

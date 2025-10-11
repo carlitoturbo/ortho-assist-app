@@ -202,7 +202,7 @@ const Planning = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="mt-6 overflow-y-auto flex-1 space-y-2 pr-2">
+        <div className="mt-6 overflow-auto flex-1 space-y-2 pr-2">
           {pendingRequests.map((request) => {
             const isExpanded = expandedRows[request.id];
             
