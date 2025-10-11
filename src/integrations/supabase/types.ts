@@ -94,27 +94,24 @@ export type Database = {
         }
         Relationships: []
       }
-      test_table: {
+      treatments: {
         Row: {
-          appointment: string | null
-          id: number
-          insurance_number: string | null
-          name: string | null
-          pain: string | null
+          created_at: string
+          id: string
+          patient_id: number | null
+          treatment: string | null
         }
         Insert: {
-          appointment?: string | null
-          id?: number
-          insurance_number?: string | null
-          name?: string | null
-          pain?: string | null
+          created_at?: string
+          id?: string
+          patient_id?: number | null
+          treatment?: string | null
         }
         Update: {
-          appointment?: string | null
-          id?: number
-          insurance_number?: string | null
-          name?: string | null
-          pain?: string | null
+          created_at?: string
+          id?: string
+          patient_id?: number | null
+          treatment?: string | null
         }
         Relationships: []
       }
