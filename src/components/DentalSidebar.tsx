@@ -8,7 +8,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarHeader,
 } from "@/components/ui/sidebar";
 
 const navItems = [
@@ -21,16 +20,7 @@ const navItems = [
 export function DentalSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r">
-      <SidebarHeader className="sticky top-0 z-20 border-b border-sidebar-border p-4 bg-sidebar-background">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-primary">
-            <span className="text-lg font-bold text-sidebar-primary-foreground">D</span>
-          </div>
-          <span className="text-lg font-semibold text-sidebar-foreground">DentalCare</span>
-        </div>
-      </SidebarHeader>
-      
-      <SidebarContent className="overflow-y-auto">
+      <SidebarContent className="overflow-y-auto pt-4">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
