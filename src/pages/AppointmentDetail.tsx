@@ -104,7 +104,7 @@ const AppointmentDetail = () => {
                   </Badge>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                <div className="grid grid-cols-3 gap-x-12 gap-y-6">
                   <div className="flex items-start gap-4">
                     <Calendar className="h-6 w-6 text-primary mt-1" />
                     <div>
