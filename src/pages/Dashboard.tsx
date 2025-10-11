@@ -80,7 +80,7 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? <p className="text-muted-foreground">Loading...</p> : upcomingAppointments.length === 0 ? <p className="text-muted-foreground">No upcoming appointments</p> : <div className="space-y-4">
-              {upcomingAppointments.map(apt => <div key={apt.id} className={`flex items-center justify-between border-l-4 ${apt.isToday ? 'border-primary' : 'border-muted-foreground'} bg-muted/30 p-4 rounded-r-lg cursor-pointer hover:bg-muted/50 transition-colors`} onClick={() => navigate("/appointments", {
+              {upcomingAppointments.map(apt => <div key={apt.id} className={`flex items-center justify-between border-l-4 ${apt.isToday ? 'border-primary' : 'border-muted-foreground'} bg-muted/30 p-4 rounded-r-lg cursor-pointer hover:bg-muted/50 transition-colors ${apt.status === 'pending' ? 'striped-background' : ''}`} onClick={() => navigate("/appointments", {
             state: {
               highlightId: apt.id
             }
