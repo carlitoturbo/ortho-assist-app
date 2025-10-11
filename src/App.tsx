@@ -27,7 +27,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => (
       </header>
       <div className="flex flex-1 overflow-hidden">
         <DentalSidebar />
-        <main className="flex-1 overflow-auto p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-6 bg-background">{children}</main>
       </div>
     </div>
   </SidebarProvider>
