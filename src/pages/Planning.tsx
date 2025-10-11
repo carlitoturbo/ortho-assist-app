@@ -136,18 +136,30 @@ const Planning = () => {
   };
 
   const handleAccept = async (id: number) => {
+    console.log("Planning: accept clicked", { id });
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("appointments")
         .update({ status: "confirmed" })
-        .eq("id", id);
+        .eq("id", id)
+        .select("id,status");
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error accepting appointment:", error);
+        toast.error("Failed to accept appointment. Do you have permission?");
+        return;
+      }
 
-      setRequests(requests.filter((r) => r.id !== id));
+      if (!data || data.length === 0) {
+        console.warn("No rows updated for appointment", { id });
+        toast.error("No appointment updated. Please check permissions and try again.");
+        return;
+      }
+
+      setRequests((prev) => prev.filter((r) => r.id !== id));
       toast.success("Appointment accepted and added to schedule!");
     } catch (error) {
-      console.error("Error accepting appointment:", error);
+      console.error("Unexpected error accepting appointment:", error);
       toast.error("Failed to accept appointment");
     }
   };
