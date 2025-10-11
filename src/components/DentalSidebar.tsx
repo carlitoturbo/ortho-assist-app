@@ -20,7 +20,7 @@ const navItems = [
 export function DentalSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r">
-      <SidebarContent className="overflow-y-auto pt-4">
+      <SidebarContent className="pt-4">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
