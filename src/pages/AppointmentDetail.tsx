@@ -3,96 +3,60 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Phone, Mail, ArrowLeft, Clock } from "lucide-react";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { format, isToday, isTomorrow } from "date-fns";
-
-interface AppointmentDetail {
-  id: number;
-  date: string;
-  time: string;
-  patient: string;
-  phone: string;
-  email: string;
-  treatment: string;
-  status: string;
-  duration: string;
-  notes?: string;
-}
 
 const AppointmentDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [appointment, setAppointment] = useState<AppointmentDetail | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchAppointment = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("appointments")
-        .select(`
-          id,
-          appointment_date,
-          appointment_time,
-          treatment,
-          status,
-          duration_minutes,
-          notes,
-          patients (
-            first_name,
-            last_name,
-            phone,
-            mail
-          )
-        `)
-        .eq("id", Number(id))
-        .maybeSingle();
+  // Mock data - in real app, fetch by ID
+  const appointments = [
+    {
+      id: 1,
+      date: "Today",
+      time: "14:00",
+      patient: "Emily Davis",
+      phone: "(555) 234-5678",
+      email: "emily.d@email.com",
+      treatment: "Checkup",
+      status: "pending",
+      duration: "30 min",
+    },
+    {
+      id: 2,
+      date: "Today",
+      time: "15:30",
+      patient: "James Wilson",
+      phone: "(555) 345-6789",
+      email: "james.w@email.com",
+      treatment: "Filling",
+      status: "confirmed",
+      duration: "45 min",
+    },
+    {
+      id: 3,
+      date: "Today",
+      time: "09:00",
+      patient: "Sarah Johnson",
+      phone: "(555) 111-2222",
+      email: "sarah.j@email.com",
+      treatment: "Cleaning",
+      status: "confirmed",
+      duration: "60 min",
+    },
+    {
+      id: 4,
+      date: "Today",
+      time: "11:00",
+      patient: "Robert Brown",
+      phone: "(555) 567-8901",
+      email: "robert.b@email.com",
+      treatment: "Root Canal",
+      status: "confirmed",
+      duration: "90 min",
+    },
+  ];
 
-      if (error) {
-        console.error("Error fetching appointment:", error);
-        setLoading(false);
-        return;
-      }
-
-      if (data) {
-        const appointmentDate = new Date(data.appointment_date);
-        let dateDisplay = format(appointmentDate, "dd/MM/yyyy");
-        
-        if (isToday(appointmentDate)) {
-          dateDisplay = "Today";
-        } else if (isTomorrow(appointmentDate)) {
-          dateDisplay = "Tomorrow";
-        }
-
-        setAppointment({
-          id: data.id,
-          date: dateDisplay,
-          time: data.appointment_time.substring(0, 5),
-          patient: `${data.patients.first_name} ${data.patients.last_name}`,
-          phone: data.patients.phone || "",
-          email: data.patients.mail || "",
-          treatment: data.treatment,
-          status: data.status,
-          duration: `${data.duration_minutes} min`,
-          notes: data.notes,
-        });
-      }
-      setLoading(false);
-    };
-
-    if (id) {
-      fetchAppointment();
-    }
-  }, [id]);
-
-  if (loading) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <p className="text-muted-foreground">Loading appointment...</p>
-      </div>
-    );
-  }
+  const appointment = appointments.find((apt) => apt.id === Number(id));
 
   if (!appointment) {
     return (
