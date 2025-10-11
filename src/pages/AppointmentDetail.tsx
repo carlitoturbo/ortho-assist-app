@@ -197,6 +197,14 @@ const AppointmentDetail = () => {
                         <CardContent className="p-6">
                           <div className="space-y-4">
                             <div>
+                              <p className="text-sm font-medium text-muted-foreground mb-2">Medical History</p>
+                              <ul className="list-disc list-inside text-base text-foreground space-y-1">
+                                <li>Hypertension (controlled)</li>
+                                <li>Type 2 Diabetes</li>
+                              </ul>
+                            </div>
+
+                            <div>
                               <p className="text-sm font-medium text-muted-foreground mb-2">Current Medications</p>
                               <ul className="list-disc list-inside text-base text-foreground space-y-1">
                                 <li>Ibuprofen 400mg as needed</li>
@@ -217,14 +225,6 @@ const AppointmentDetail = () => {
                                 <li>Root canal (2 years ago)</li>
                                 <li>Teeth whitening (1 year ago)</li>
                                 <li>Wisdom teeth extraction (5 years ago)</li>
-                              </ul>
-                            </div>
-
-                            <div>
-                              <p className="text-sm font-medium text-muted-foreground mb-2">Insurance</p>
-                              <ul className="list-disc list-inside text-base text-foreground space-y-1">
-                                <li>Provider: Delta Dental</li>
-                                <li>Policy #: DD-12345678</li>
                               </ul>
                             </div>
                           </div>
