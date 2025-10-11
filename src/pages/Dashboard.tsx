@@ -1,16 +1,54 @@
 import { Calendar, Clock, Users, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { format } from "date-fns";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  
-  const todayAppointments = [
-    { id: 3, time: "09:00", patient: "Sarah Johnson", treatment: "Cleaning", status: "confirmed" },
-    { id: 4, time: "10:30", patient: "Michael Chen", treatment: "Root Canal", status: "confirmed" },
-    { id: 1, time: "14:00", patient: "Emily Davis", treatment: "Checkup", status: "pending" },
-    { id: 2, time: "15:30", patient: "James Wilson", treatment: "Filling", status: "confirmed" },
-  ];
+  const [upcomingAppointments, setUpcomingAppointments] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchUpcomingAppointments();
+  }, []);
+
+  const fetchUpcomingAppointments = async () => {
+    try {
+      const today = format(new Date(), "yyyy-MM-dd");
+      
+      const { data, error } = await supabase
+        .from("appointments")
+        .select(`
+          *,
+          patients (
+            first_name,
+            last_name
+          )
+        `)
+        .gte("appointment_date", today)
+        .order("appointment_date", { ascending: true })
+        .order("appointment_time", { ascending: true })
+        .limit(3);
+
+      if (error) throw error;
+
+      const formatted = data?.map((apt: any) => ({
+        id: apt.id,
+        time: apt.appointment_time.substring(0, 5),
+        patient: `${apt.patients.first_name} ${apt.patients.last_name}`,
+        treatment: apt.treatment,
+        status: apt.status,
+      })) || [];
+
+      setUpcomingAppointments(formatted);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const stats = [
     { label: "Today's Appointments", value: "8", icon: Calendar, color: "text-primary" },
@@ -42,11 +80,16 @@ const Dashboard = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Today's Schedule</CardTitle>
+          <CardTitle>Upcoming Appointments</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {todayAppointments.map((apt) => (
+          {isLoading ? (
+            <p className="text-muted-foreground">Loading...</p>
+          ) : upcomingAppointments.length === 0 ? (
+            <p className="text-muted-foreground">No upcoming appointments</p>
+          ) : (
+            <div className="space-y-4">
+              {upcomingAppointments.map((apt) => (
               <div
                 key={apt.id}
                 className="flex items-center justify-between border-l-4 border-primary bg-muted/30 p-4 rounded-r-lg cursor-pointer hover:bg-muted/50 transition-colors"
@@ -69,8 +112,9 @@ const Dashboard = () => {
                   {apt.status}
                 </div>
               </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
