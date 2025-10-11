@@ -1,12 +1,15 @@
 import { Calendar, Clock, Users, TrendingUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  
   const todayAppointments = [
-    { time: "09:00", patient: "Sarah Johnson", treatment: "Cleaning", status: "confirmed" },
-    { time: "10:30", patient: "Michael Chen", treatment: "Root Canal", status: "confirmed" },
-    { time: "14:00", patient: "Emily Davis", treatment: "Checkup", status: "pending" },
-    { time: "15:30", patient: "James Wilson", treatment: "Filling", status: "confirmed" },
+    { id: 3, time: "09:00", patient: "Sarah Johnson", treatment: "Cleaning", status: "confirmed" },
+    { id: 4, time: "10:30", patient: "Michael Chen", treatment: "Root Canal", status: "confirmed" },
+    { id: 1, time: "14:00", patient: "Emily Davis", treatment: "Checkup", status: "pending" },
+    { id: 2, time: "15:30", patient: "James Wilson", treatment: "Filling", status: "confirmed" },
   ];
 
   const stats = [
@@ -43,10 +46,11 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {todayAppointments.map((apt, index) => (
+            {todayAppointments.map((apt) => (
               <div
-                key={index}
-                className="flex items-center justify-between border-l-4 border-primary bg-muted/30 p-4 rounded-r-lg"
+                key={apt.id}
+                className="flex items-center justify-between border-l-4 border-primary bg-muted/30 p-4 rounded-r-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => navigate("/appointments", { state: { highlightId: apt.id } })}
               >
                 <div className="flex items-center gap-4">
                   <div className="font-semibold text-primary min-w-[80px]">{apt.time}</div>

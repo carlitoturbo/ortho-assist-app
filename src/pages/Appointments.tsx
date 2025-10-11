@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { AppointmentsDayCalendar } from "@/components/AppointmentsDayCalendar";
+import { useLocation } from "react-router-dom";
 
 interface AppointmentType {
   id: number;
@@ -19,7 +20,10 @@ interface AppointmentType {
 }
 
 const Appointments = () => {
-  const [highlightedId, setHighlightedId] = useState<number | null>(null);
+  const location = useLocation();
+  const [highlightedId, setHighlightedId] = useState<number | null>(
+    location.state?.highlightId || null
+  );
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const appointmentRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
@@ -137,6 +141,19 @@ const Appointments = () => {
       });
     }
   }, [highlightedId]);
+
+  // Set initial day based on highlighted appointment
+  useEffect(() => {
+    if (location.state?.highlightId) {
+      const apt = appointments.find((a) => a.id === location.state.highlightId);
+      if (apt) {
+        const dayIndex = uniqueDays.indexOf(apt.date);
+        if (dayIndex !== -1) {
+          setSelectedDayIndex(dayIndex);
+        }
+      }
+    }
+  }, [location.state]);
 
   const handleAppointmentInteraction = (id: number) => {
     setHighlightedId(id);
