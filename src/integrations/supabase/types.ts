@@ -91,6 +91,30 @@ export type Database = {
         }
         Relationships: []
       }
+      test_table: {
+        Row: {
+          appointment: string | null
+          id: number
+          insurance_number: string | null
+          name: string | null
+          pain: string | null
+        }
+        Insert: {
+          appointment?: string | null
+          id?: number
+          insurance_number?: string | null
+          name?: string | null
+          pain?: string | null
+        }
+        Update: {
+          appointment?: string | null
+          id?: number
+          insurance_number?: string | null
+          name?: string | null
+          pain?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
