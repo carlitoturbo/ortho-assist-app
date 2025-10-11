@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, Phone, Mail, Calendar } from "lucide-react";
+import { Search, Phone, Mail, Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,7 @@ interface AppointmentType {
 
 const Appointments = () => {
   const [highlightedId, setHighlightedId] = useState<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState("Today");
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const appointmentRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
 
   const appointments: AppointmentType[] = [
@@ -90,7 +90,43 @@ const Appointments = () => {
       status: "confirmed",
       duration: "45 min",
     },
+    {
+      id: 7,
+      date: "Mar 15, 2025",
+      time: "9:30 AM",
+      patient: "Jennifer Taylor",
+      phone: "(555) 890-1234",
+      email: "jennifer.t@email.com",
+      treatment: "Crown",
+      status: "confirmed",
+      duration: "75 min",
+    },
+    {
+      id: 8,
+      date: "Mar 15, 2025",
+      time: "1:00 PM",
+      patient: "Michael Anderson",
+      phone: "(555) 901-2345",
+      email: "michael.a@email.com",
+      treatment: "Cleaning",
+      status: "pending",
+      duration: "45 min",
+    },
   ];
+
+  // Get unique days
+  const uniqueDays = Array.from(new Set(appointments.map((apt) => apt.date)));
+  const selectedDay = uniqueDays[selectedDayIndex];
+
+  const handlePreviousDay = () => {
+    setSelectedDayIndex((prev) => Math.max(0, prev - 1));
+    setHighlightedId(null);
+  };
+
+  const handleNextDay = () => {
+    setSelectedDayIndex((prev) => Math.min(uniqueDays.length - 1, prev + 1));
+    setHighlightedId(null);
+  };
 
   useEffect(() => {
     if (highlightedId && appointmentRefs.current[highlightedId]) {
@@ -103,14 +139,10 @@ const Appointments = () => {
   }, [highlightedId]);
 
   const handleAppointmentInteraction = (id: number) => {
-    const apt = appointments.find((a) => a.id === id);
-    if (apt) {
-      setSelectedDate(apt.date);
-      setHighlightedId(id);
-    }
+    setHighlightedId(id);
   };
 
-  const todayAppointments = appointments.filter((apt) => apt.date === selectedDate);
+  const dayAppointments = appointments.filter((apt) => apt.date === selectedDay);
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col">
@@ -125,10 +157,41 @@ const Appointments = () => {
         </div>
       </div>
 
+      {/* Day Navigation Bar */}
+      <div className="flex items-center justify-between mb-4 px-4 py-3 bg-muted/30 rounded-lg border border-border">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handlePreviousDay}
+          disabled={selectedDayIndex === 0}
+          className="h-10 w-10"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </Button>
+        
+        <div className="flex items-center gap-2">
+          <Calendar className="h-5 w-5 text-muted-foreground" />
+          <span className="text-lg font-semibold text-foreground">{selectedDay}</span>
+          <Badge variant="secondary" className="ml-2">
+            {dayAppointments.length} {dayAppointments.length === 1 ? "appointment" : "appointments"}
+          </Badge>
+        </div>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleNextDay}
+          disabled={selectedDayIndex === uniqueDays.length - 1}
+          className="h-10 w-10"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </Button>
+      </div>
+
       <div className="flex gap-6 flex-1 overflow-hidden">
         {/* Left Side - Appointments List */}
         <div className="flex-1 overflow-y-auto space-y-3 pr-2 p-1">
-          {appointments.map((apt) => {
+          {dayAppointments.map((apt) => {
             const isHighlighted = highlightedId === apt.id;
             
             return (
@@ -211,7 +274,7 @@ const Appointments = () => {
         {/* Right Side - Day Calendar View */}
         <div className="w-[500px] border-l border-border pl-6">
           <AppointmentsDayCalendar
-            appointments={todayAppointments.map((apt) => ({
+            appointments={dayAppointments.map((apt) => ({
               id: apt.id,
               time: apt.time,
               duration: apt.duration,
@@ -219,7 +282,7 @@ const Appointments = () => {
               treatment: apt.treatment,
               status: apt.status,
             }))}
-            selectedDate={selectedDate}
+            selectedDate={selectedDay}
             highlightedId={highlightedId}
             onAppointmentClick={handleAppointmentInteraction}
             onAppointmentHover={setHighlightedId}
