@@ -31,10 +31,12 @@ const Dashboard = () => {
       if (error) throw error;
       const formatted = data?.map((apt: any) => ({
         id: apt.id,
+        date: apt.appointment_date,
         time: apt.appointment_time.substring(0, 5),
         patient: `${apt.patients.first_name} ${apt.patients.last_name}`,
         treatment: apt.treatment,
-        status: apt.status
+        status: apt.status,
+        isToday: apt.appointment_date === today
       })) || [];
       setUpcomingAppointments(formatted);
     } catch (error) {
@@ -60,7 +62,7 @@ const Dashboard = () => {
         <p className="text-muted-foreground mt-1">Welcome back! Here's your overview for today.</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2">
         {stats.map(stat => <Card key={stat.label}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{stat.label}</CardTitle>
@@ -78,13 +80,16 @@ const Dashboard = () => {
         </CardHeader>
         <CardContent>
           {isLoading ? <p className="text-muted-foreground">Loading...</p> : upcomingAppointments.length === 0 ? <p className="text-muted-foreground">No upcoming appointments</p> : <div className="space-y-4">
-              {upcomingAppointments.map(apt => <div key={apt.id} className="flex items-center justify-between border-l-4 border-primary bg-muted/30 p-4 rounded-r-lg cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate("/appointments", {
+              {upcomingAppointments.map(apt => <div key={apt.id} className={`flex items-center justify-between border-l-4 ${apt.isToday ? 'border-primary' : 'border-muted-foreground'} bg-muted/30 p-4 rounded-r-lg cursor-pointer hover:bg-muted/50 transition-colors`} onClick={() => navigate("/appointments", {
             state: {
               highlightId: apt.id
             }
           })}>
                 <div className="flex items-center gap-4">
-                  <div className="font-semibold text-primary min-w-[80px]">{apt.time}</div>
+                  <div className={`font-semibold ${apt.isToday ? 'text-primary' : 'text-muted-foreground'} min-w-[80px]`}>{apt.time}</div>
+                  <div className={`font-medium ${apt.isToday ? 'text-primary' : 'text-muted-foreground'} min-w-[100px]`}>
+                    {format(new Date(apt.date), "MMM dd")}
+                  </div>
                   <div>
                     <div className="font-medium text-foreground">{apt.patient}</div>
                     <div className="text-sm text-muted-foreground">{apt.treatment}</div>
