@@ -42,15 +42,15 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    /* Sidebar colors */
-    --sidebar-background: 217 70% 28%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 210 80% 48%;
+    /* Sidebar colors - Gray theme matching the rest of the app */
+    --sidebar-background: 220 15% 97%;
+    --sidebar-foreground: 215 25% 20%;
+    --sidebar-primary: 217 70% 28%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 60% 35%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 217 60% 25%;
-    --sidebar-ring: 210 80% 48%;
+    --sidebar-accent: 215 20% 92%;
+    --sidebar-accent-foreground: 217 70% 28%;
+    --sidebar-border: 215 20% 88%;
+    --sidebar-ring: 217 70% 28%;
 
     /* Success color for appointments */
     --success: 140 65% 45%;
@@ -86,13 +86,13 @@ All colors MUST be HSL.
     --input: 215 25% 22%;
     --ring: 210 80% 55%;
     
-    --sidebar-background: 215 30% 10%;
+    --sidebar-background: 215 28% 16%;
     --sidebar-foreground: 0 0% 95%;
     --sidebar-primary: 210 80% 55%;
-    --sidebar-primary-foreground: 215 30% 10%;
-    --sidebar-accent: 215 28% 18%;
+    --sidebar-primary-foreground: 215 30% 12%;
+    --sidebar-accent: 215 25% 22%;
     --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 215 25% 18%;
+    --sidebar-border: 215 25% 22%;
     --sidebar-ring: 210 80% 55%;
 
     --success: 140 65% 50%;
