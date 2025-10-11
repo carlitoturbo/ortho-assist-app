@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { AppointmentsDayCalendar } from "@/components/AppointmentsDayCalendar";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
+import { format, isToday, isTomorrow } from "date-fns";
 
 interface AppointmentType {
   id: number;
@@ -28,80 +28,70 @@ const Appointments = () => {
     location.state?.highlightId || null
   );
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
-  const [appointments, setAppointments] = useState<AppointmentType[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const appointmentRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+  const [appointments, setAppointments] = useState<AppointmentType[]>([]);
+  const [loading, setLoading] = useState(true);
 
+  // Fetch appointments from Supabase
   useEffect(() => {
-    fetchAppointments();
-  }, []);
-
-  const fetchAppointments = async () => {
-    try {
-      setIsLoading(true);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
+    const fetchAppointments = async () => {
+      setLoading(true);
       const { data, error } = await supabase
         .from("appointments")
         .select(`
           id,
           appointment_date,
           appointment_time,
-          duration_minutes,
           treatment,
           status,
-          notes,
+          duration_minutes,
           patients (
-            id,
             first_name,
             last_name,
             phone,
             mail
           )
         `)
-        .gte("appointment_date", today.toISOString().split("T")[0])
         .order("appointment_date", { ascending: true })
         .order("appointment_time", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching appointments:", error);
+        setLoading(false);
+        return;
+      }
 
-      const formattedAppointments: AppointmentType[] = data.map((apt: any) => {
-        const appointmentDate = new Date(apt.appointment_date);
-        const todayDate = new Date();
-        todayDate.setHours(0, 0, 0, 0);
-        const tomorrowDate = new Date(todayDate);
-        tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+      if (data) {
+        const formattedAppointments: AppointmentType[] = data.map((apt: any) => {
+          const appointmentDate = new Date(apt.appointment_date);
+          let dateDisplay = format(appointmentDate, "dd/MM/yyyy");
+          
+          if (isToday(appointmentDate)) {
+            dateDisplay = "Today";
+          } else if (isTomorrow(appointmentDate)) {
+            dateDisplay = "Tomorrow";
+          }
 
-        let dateLabel: string;
-        if (appointmentDate.getTime() === todayDate.getTime()) {
-          dateLabel = "Today";
-        } else if (appointmentDate.getTime() === tomorrowDate.getTime()) {
-          dateLabel = "Tomorrow";
-        } else {
-          dateLabel = format(appointmentDate, "dd/MM/yyyy");
-        }
+          return {
+            id: apt.id,
+            date: dateDisplay,
+            time: apt.appointment_time.substring(0, 5), // Format HH:MM
+            patient: `${apt.patients.first_name} ${apt.patients.last_name}`,
+            phone: apt.patients.phone || "",
+            email: apt.patients.mail || "",
+            treatment: apt.treatment,
+            status: apt.status,
+            duration: `${apt.duration_minutes} min`,
+          };
+        });
 
-        return {
-          id: apt.id,
-          date: dateLabel,
-          time: apt.appointment_time.substring(0, 5),
-          patient: `${apt.patients.first_name} ${apt.patients.last_name}`,
-          phone: apt.patients.phone || "N/A",
-          email: apt.patients.mail || "N/A",
-          treatment: apt.treatment,
-          status: apt.status,
-          duration: `${apt.duration_minutes} min`,
-        };
-      });
+        setAppointments(formattedAppointments);
+      }
+      setLoading(false);
+    };
 
-      setAppointments(formattedAppointments);
-    } catch (error) {
-      console.error("Error fetching appointments:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    fetchAppointments();
+  }, []);
 
   // Get unique days
   const uniqueDays = Array.from(new Set(appointments.map((apt) => apt.date)));
@@ -146,7 +136,7 @@ const Appointments = () => {
 
   const dayAppointments = appointments.filter((apt) => apt.date === selectedDay);
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="h-full flex items-center justify-center">
         <p className="text-muted-foreground">Loading appointments...</p>
