@@ -135,9 +135,21 @@ const Planning = () => {
     }
   };
 
-  const handleAccept = (id: number) => {
-    setRequests(requests.filter((r) => r.id !== id));
-    toast.success("Appointment accepted and added to schedule!");
+  const handleAccept = async (id: number) => {
+    try {
+      const { error } = await supabase
+        .from("appointments")
+        .update({ status: "confirmed" })
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setRequests(requests.filter((r) => r.id !== id));
+      toast.success("Appointment accepted and added to schedule!");
+    } catch (error) {
+      console.error("Error accepting appointment:", error);
+      toast.error("Failed to accept appointment");
+    }
   };
 
   const handleDecline = (id: number) => {
