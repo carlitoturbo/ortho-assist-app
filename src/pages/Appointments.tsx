@@ -36,6 +36,7 @@ const Appointments = () => {
   useEffect(() => {
     const fetchAppointments = async () => {
       setLoading(true);
+      const today = new Date().toISOString().split('T')[0];
       const { data, error } = await supabase
         .from("appointments")
         .select(`
@@ -52,6 +53,8 @@ const Appointments = () => {
             mail
           )
         `)
+        .eq("status", "confirmed")
+        .gte("appointment_date", today)
         .order("appointment_date", { ascending: true })
         .order("appointment_time", { ascending: true });
 
