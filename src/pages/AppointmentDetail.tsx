@@ -76,7 +76,7 @@ const AppointmentDetail = () => {
   return (
     <div className="h-full overflow-auto">
       <div className="w-full px-6 space-y-6">
-        <div className="flex items-center gap-4">
+        <div className="sticky top-0 z-10 bg-background flex items-center gap-4 py-4 border-b border-border px-6">
           <Button variant="ghost" onClick={() => navigate("/appointments")}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
