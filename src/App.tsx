@@ -21,9 +21,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => (
         <SidebarTrigger />
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <span className="text-lg font-bold text-primary-foreground">D</span>
+            <span className="text-lg font-bold text-primary-foreground">N</span>
           </div>
-          <span className="text-lg font-semibold text-foreground">DentalCare</span>
+          <span className="text-lg font-semibold text-foreground">Nelly Furtado</span>
         </div>
       </header>
       <div className="flex flex-1 overflow-hidden">
