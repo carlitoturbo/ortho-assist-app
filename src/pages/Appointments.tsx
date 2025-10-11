@@ -111,8 +111,10 @@ const Appointments = () => {
     }
   }, [highlightedId]);
 
-  // Set initial day based on highlighted appointment
+  // Set initial day to today or based on highlighted appointment
   useEffect(() => {
+    if (appointments.length === 0) return;
+
     if (location.state?.highlightId) {
       const apt = appointments.find((a) => a.id === location.state.highlightId);
       if (apt) {
@@ -121,8 +123,14 @@ const Appointments = () => {
           setSelectedDayIndex(dayIndex);
         }
       }
+    } else {
+      // Default to "Today" if it exists
+      const todayIndex = uniqueDays.indexOf("Today");
+      if (todayIndex !== -1) {
+        setSelectedDayIndex(todayIndex);
+      }
     }
-  }, [location.state]);
+  }, [appointments, location.state]);
 
   const handleAppointmentInteraction = (id: number) => {
     navigate(`/appointments/${id}`);
