@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Mic, Square, Loader2 } from "lucide-react";
+import { Mic, Square, Loader2, Pause, Play, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -11,10 +11,43 @@ interface AudioRecorderProps {
 
 export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecorderProps) => {
   const [isRecording, setIsRecording] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [existingRecording, setExistingRecording] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const { toast } = useToast();
+
+  useEffect(() => {
+    checkExistingRecording();
+  }, [appointmentId]);
+
+  const checkExistingRecording = async () => {
+    try {
+      const { data, error } = await supabase.storage
+        .from("appointment-recordings")
+        .list(`${appointmentId}/`, {
+          limit: 1,
+          sortBy: { column: "created_at", order: "desc" },
+        });
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        const filePath = `${appointmentId}/${data[0].name}`;
+        const { data: urlData } = supabase.storage
+          .from("appointment-recordings")
+          .getPublicUrl(filePath);
+        setExistingRecording(urlData.publicUrl);
+      }
+    } catch (error) {
+      console.error("Error checking existing recording:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const startRecording = async () => {
     try {
@@ -56,12 +89,62 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
+      setIsPaused(false);
+    }
+  };
+
+  const pauseRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.pause();
+      setIsPaused(true);
+    }
+  };
+
+  const resumeRecording = () => {
+    if (mediaRecorderRef.current && isPaused) {
+      mediaRecorderRef.current.resume();
+      setIsPaused(false);
+    }
+  };
+
+  const saveCurrentRecording = async () => {
+    if (mediaRecorderRef.current && isPaused) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+      setIsPaused(false);
+    }
+  };
+
+  const playRecording = () => {
+    if (existingRecording) {
+      if (!audioRef.current) {
+        audioRef.current = new Audio(existingRecording);
+      }
+      audioRef.current.play();
+      toast({
+        title: "Playing recording",
+        description: "Audio playback started",
+      });
     }
   };
 
   const saveRecording = async (audioBlob: Blob) => {
     setIsSaving(true);
     try {
+      // Delete existing recording if any
+      if (existingRecording) {
+        const { data: files } = await supabase.storage
+          .from("appointment-recordings")
+          .list(`${appointmentId}/`);
+        
+        if (files && files.length > 0) {
+          const filesToDelete = files.map(file => `${appointmentId}/${file.name}`);
+          await supabase.storage
+            .from("appointment-recordings")
+            .remove(filesToDelete);
+        }
+      }
+
       const timestamp = new Date().toISOString();
       const fileName = `appointment-${appointmentId}-${timestamp}.webm`;
       const filePath = `${appointmentId}/${fileName}`;
@@ -78,6 +161,8 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
       const { data: urlData } = supabase.storage
         .from("appointment-recordings")
         .getPublicUrl(filePath);
+
+      setExistingRecording(urlData.publicUrl);
 
       toast({
         title: "Recording saved",
@@ -99,6 +184,29 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
     }
   };
 
+  if (isLoading) {
+    return (
+      <Button variant="outline" size="sm" disabled className="gap-2">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        Loading...
+      </Button>
+    );
+  }
+
+  if (existingRecording && !isRecording) {
+    return (
+      <Button
+        onClick={playRecording}
+        variant="outline"
+        size="sm"
+        className="gap-2"
+      >
+        <Play className="h-4 w-4" />
+        Play Recording
+      </Button>
+    );
+  }
+
   return (
     <div className="flex items-center gap-2">
       {!isRecording && !isSaving && (
@@ -113,16 +221,50 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
         </Button>
       )}
       
-      {isRecording && (
-        <Button
-          onClick={stopRecording}
-          variant="destructive"
-          size="sm"
-          className="gap-2 animate-pulse"
-        >
-          <Square className="h-4 w-4" />
-          Stop Recording
-        </Button>
+      {isRecording && !isPaused && (
+        <>
+          <Button
+            onClick={stopRecording}
+            variant="destructive"
+            size="sm"
+            className="gap-2"
+          >
+            <Square className="h-4 w-4" />
+            Stop
+          </Button>
+          <Button
+            onClick={pauseRecording}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            <Pause className="h-4 w-4" />
+            Pause
+          </Button>
+        </>
+      )}
+
+      {isPaused && (
+        <>
+          <Button
+            onClick={resumeRecording}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            <Mic className="h-4 w-4" />
+            Resume
+          </Button>
+          <Button
+            onClick={saveCurrentRecording}
+            variant="default"
+            size="sm"
+            className="gap-2"
+          >
+            <Save className="h-4 w-4" />
+            Save
+          </Button>
+        </>
       )}
       
       {isSaving && (
