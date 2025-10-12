@@ -1,8 +1,18 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Mic, Square, Loader2, Pause, Play, Save, SkipBack, SkipForward } from "lucide-react";
+import { Mic, Square, Loader2, Pause, Play, Save, SkipBack, SkipForward, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface AudioRecorderProps {
   appointmentId: number;
@@ -16,6 +26,8 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
   const [existingRecording, setExistingRecording] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -161,6 +173,48 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
     }
   };
 
+  const deleteRecording = async () => {
+    setIsDeleting(true);
+    try {
+      const { data: files } = await supabase.storage
+        .from("appointment-recordings")
+        .list(`${appointmentId}/`);
+      
+      if (files && files.length > 0) {
+        const filesToDelete = files.map(file => `${appointmentId}/${file.name}`);
+        const { error } = await supabase.storage
+          .from("appointment-recordings")
+          .remove(filesToDelete);
+        
+        if (error) throw error;
+      }
+
+      // Stop and cleanup audio player
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+
+      setExistingRecording(null);
+      setIsPlaying(false);
+      setShowDeleteDialog(false);
+
+      toast({
+        title: "Recording deleted",
+        description: "The recording has been removed successfully",
+      });
+    } catch (error) {
+      console.error("Error deleting recording:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete recording",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const saveRecording = async (audioBlob: Blob) => {
     setIsSaving(true);
     try {
@@ -228,49 +282,81 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
 
   if (existingRecording && !isRecording) {
     return (
-      <div className="flex items-center gap-2">
-        {!isPlaying ? (
+      <>
+        <div className="flex items-center gap-2">
+          {!isPlaying ? (
+            <Button
+              onClick={playRecording}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <Play className="h-4 w-4" />
+              Play
+            </Button>
+          ) : (
+            <>
+              <Button
+                onClick={pausePlayback}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <Pause className="h-4 w-4" />
+                Pause
+              </Button>
+              <Button
+                onClick={skipBackward}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <SkipBack className="h-4 w-4" />
+                -15s
+              </Button>
+              <Button
+                onClick={skipForward}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <SkipForward className="h-4 w-4" />
+                +15s
+              </Button>
+            </>
+          )}
           <Button
-            onClick={playRecording}
-            variant="outline"
+            onClick={() => setShowDeleteDialog(true)}
+            variant="destructive"
             size="sm"
             className="gap-2"
+            disabled={isDeleting}
           >
-            <Play className="h-4 w-4" />
-            Play
+            <Trash2 className="h-4 w-4" />
+            Delete
           </Button>
-        ) : (
-          <>
-            <Button
-              onClick={pausePlayback}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
-              <Pause className="h-4 w-4" />
-              Pause
-            </Button>
-            <Button
-              onClick={skipBackward}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
-              <SkipBack className="h-4 w-4" />
-              -15s
-            </Button>
-            <Button
-              onClick={skipForward}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
-              <SkipForward className="h-4 w-4" />
-              +15s
-            </Button>
-          </>
-        )}
-      </div>
+        </div>
+
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Recording</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this recording? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={deleteRecording}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </>
     );
   }
 

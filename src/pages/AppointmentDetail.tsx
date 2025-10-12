@@ -269,15 +269,17 @@ const AppointmentDetail = () => {
                         )}
                         
                         <div className="relative">
-                          <h3 className="text-lg font-semibold text-foreground mb-4">Meeting Notes</h3>
+                          <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-semibold text-foreground">Meeting Notes</h3>
+                            <AudioRecorder appointmentId={appointment.id} />
+                          </div>
                           <Textarea
                             value={meetingNotes}
                             onChange={(e) => setMeetingNotes(e.target.value)}
                             placeholder="Enter key points discussed during the appointment..."
                             className="min-h-[150px] resize-y w-full"
                           />
-                          <div className="flex items-center justify-between mt-4">
-                            <AudioRecorder appointmentId={appointment.id} />
+                          <div className="flex justify-end mt-4">
                             <Button
                               onClick={saveMeetingNotes}
                               disabled={isSaving}
