@@ -164,7 +164,7 @@ const PatientDetail = () => {
                     <TableRow
                       key={appointment.id}
                       className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => navigate(`/appointments/${appointment.id}`)}
+                      onClick={() => navigate(`/patients/${id}/appointments/${appointment.id}`)}
                     >
                       <TableCell className="font-medium">
                         <div className="flex items-center gap-2">

@@ -11,6 +11,7 @@ import Appointments from "./pages/Appointments";
 import AppointmentDetail from "./pages/AppointmentDetail";
 import Patients from "./pages/Patients";
 import PatientDetail from "./pages/PatientDetail";
+import PatientAppointmentDetail from "./pages/PatientAppointmentDetail";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import toothIcon from "@/assets/tooth-icon.png";
@@ -44,6 +45,7 @@ const App = () => (
           <Route path="/" element={<Layout><Dashboard /></Layout>} />
           <Route path="/patients" element={<Layout><Patients /></Layout>} />
           <Route path="/patients/:id" element={<Layout><PatientDetail /></Layout>} />
+          <Route path="/patients/:patientId/appointments/:appointmentId" element={<Layout><PatientAppointmentDetail /></Layout>} />
           <Route path="/planning" element={<Layout><Planning /></Layout>} />
           <Route path="/appointments" element={<Layout><Appointments /></Layout>} />
           <Route path="/appointments/:id" element={<Layout><AppointmentDetail /></Layout>} />
