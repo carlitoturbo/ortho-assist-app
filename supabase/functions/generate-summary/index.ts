@@ -25,12 +25,12 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    console.log('Fetching appointment transcription for ID:', appointmentId);
+    console.log('Fetching appointment data for ID:', appointmentId);
 
-    // Get the transcription
+    // Get the transcription, notes, and meeting_notes
     const { data: appointment, error: fetchError } = await supabase
       .from('appointments')
-      .select('transcription')
+      .select('transcription, notes, meeting_notes')
       .eq('id', appointmentId)
       .single();
 
@@ -65,11 +65,16 @@ Deno.serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a medical assistant that creates concise executive summaries of dental appointment transcriptions. Focus on key points: diagnosis, treatment performed, patient concerns, and follow-up actions. Keep it professional and brief (3-5 sentences).'
+            content: 'You are a medical assistant that creates concise executive summaries of dental appointments. Focus on key points: diagnosis, treatment performed, patient concerns, and follow-up actions. Keep it professional and brief (3-5 sentences). Use markdown formatting for better readability.'
           },
           {
             role: 'user',
-            content: `Please create an executive summary of this dental appointment transcription:\n\n${appointment.transcription}`
+            content: `Please create an executive summary of this dental appointment:
+
+**Transcription:**
+${appointment.transcription}
+
+${appointment.notes ? `**Notes:**\n${appointment.notes}\n\n` : ''}${appointment.meeting_notes ? `**Meeting Notes:**\n${appointment.meeting_notes}` : ''}`
           }
         ],
       }),
