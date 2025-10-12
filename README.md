@@ -53,7 +53,6 @@ npm run dev
 ## What technologies are used for this project?
 
 This project is built with:
-
 - Vite
 - TypeScript
 - React
@@ -67,6 +66,132 @@ Additionally, whe used the following tools:
 - twillio
 - openAI
 - livekit
+
+---
+## Overall explanation
+
+The Dental Agent System is a patient-centric automation platform designed to streamline the information intake, appointment scheduling, and treatment documentation process for dental practices. The system integrates **Lovable** as the front-end interface, **Supabase** as the backend database and file storage, and **n8n** for workflow automation. Calls are handled through **Cartesia’s LifeKit agent**, with communication managed via **Twilio**.
+
+Together, these components create a seamless experience — from the first patient call to the final treatment summary.
+
+---
+
+## System Architecture
+
+**Frontend:** [Lovable](https://lovable.dev)
+**Backend:** [Supabase](https://supabase.com)
+**Automation Layer:** [n8n](https://n8n.io)
+**Telephony & AI Agent:** [LifeKit (Cartesia)](https://cartesia.ai)
+**Messaging Service:** [Twilio](https://www.twilio.com)
+
+---
+
+## Database Structure (Supabase)
+
+The backend database is built on Supabase and includes several key tables and storage buckets:
+
+* **patients** — stores all patient-related data (name, contact information, notes, etc.).
+* **appointments** — stores all scheduled appointments, including links to associated patients and treatments.
+* **treatments** — keeps a record of past and ongoing treatments, connected to the relevant appointment and patient.
+* **recording buckets** — store audio/video recordings from each appointment.
+
+These tables are relationally linked, enabling the application to retrieve and display contextual information across patients, appointments, and treatments.
+
+---
+
+## Core Workflow
+
+### 1. Incoming Call & Data Retrieval
+
+When a patient calls through **LifeKit**, the agent:
+
+* Retrieves patient data from Supabase.
+* Checks whether the patient already exists in the database.
+* Determines the next available appointment slots and keeps going back and forth with the patient until they reach an agreement
+
+If the patient is new, a record is created automatically in the `patients` table.
+
+---
+
+### 2. Scheduling & Database Update
+
+During the call, the agent schedules the appointment and records the conversation.
+Once the call ends:
+
+* The recorded data and appointment details are passed through **n8n** and on the way parsed with the help of OpenAI.
+* n8n pushes the appointment information to Supabase, where it is stored with the status `pending`.
+
+This pending appointment is now visible in the **Lovable** front-end.
+
+---
+
+### 3. Appointment Approval Workflow
+
+Within the Lovable app, users (e.g., dental staff) can **approve or decline** pending appointments.
+Based on their decision:
+
+* If **approved**, the appointment status updates to `approved`, and a confirmation message is sent to the patient via **Twilio**.
+* If **declined**, the appointment status updates to `declined`, and the event is removed from the active appointment overview. The patient receives a cancellation message via **Twilio** 
+
+All communication triggers and state updates are handled through **n8n** automation workflows.
+
+---
+
+### 4. Appointment Recording & Storage
+
+When the appointment takes place:
+
+* The user can start a recording directly in the Lovable interface.
+* The audio/video file is uploaded to Supabase storage buckets and linked to the relevant appointment entry.
+
+---
+
+### 5. AI-Powered Transcription & Summary
+
+After the recording is complete:
+
+* Supabase triggers a background function that uses **OpenAI** to generate a **transcription** of the recording.
+* The transcription is combined with call data and any additional notes from the doctor to create an excutive summary with the help of OpenAI. This is saved in the appointments table as well 
+
+This summary becomes visible in the patient's appointment history for quick review.
+
+---
+
+## Data Flow Summary
+
+```
+LifeKit Call
+   ↓
+Supabase → check / create patient
+   ↓
+Appointment scheduling
+   ↓
+n8n → push to Supabase (status: pending)
+   ↓
+Lovable app → approval / decline (status is changed accordingly)
+   ↓
+Twilio → notify patient
+
+Once the appointments occurs: 
+Recording → Supabase bucket
+   ↓
+OpenAI → transcription + summary
+   ↓
+Lovable → display appointment details + summary
+```
+
+---
+
+## Key Features
+
+* **Automated patient data management** via Supabase integration.
+* **Real-time appointment synchronization** between calls, backend, and UI.
+* **AI-generated summaries** for efficient review of past consultations.
+* **Fully automated communication** through n8n and Twilio.
+* **Scalable backend design** supporting additional tables and event triggers.
+
+---
+
 
 ## How can I deploy this project?
 
