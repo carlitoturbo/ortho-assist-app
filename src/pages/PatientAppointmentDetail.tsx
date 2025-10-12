@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Loader2, FileAudio } from "lucide-react";
+import { ArrowLeft, Loader2, FileAudio, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
+import { CustomAudioPlayer } from "@/components/CustomAudioPlayer";
 
 interface AppointmentData {
   id: number;
@@ -16,6 +17,7 @@ interface AppointmentData {
   status: string;
   duration_minutes: number;
   transcription: string | null;
+  summary: string | null;
   patient?: {
     first_name: string | null;
     last_name: string | null;
@@ -30,6 +32,8 @@ const PatientAppointmentDetail = () => {
   const [appointment, setAppointment] = useState<AppointmentData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isTranscribing, setIsTranscribing] = useState(false);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [showFullTranscript, setShowFullTranscript] = useState(false);
   const [hasRecording, setHasRecording] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
@@ -119,6 +123,36 @@ const PatientAppointmentDetail = () => {
     }
   };
 
+  const handleGenerateSummary = async () => {
+    if (!appointment) return;
+    
+    setIsGeneratingSummary(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-summary', {
+        body: { appointmentId: appointment.id }
+      });
+
+      if (error) throw error;
+
+      if (data?.summary) {
+        setAppointment({ ...appointment, summary: data.summary });
+        toast({
+          title: "Summary generated",
+          description: "Executive summary has been created successfully",
+        });
+      }
+    } catch (error) {
+      console.error("Error generating summary:", error);
+      toast({
+        title: "Error",
+        description: "Failed to generate summary",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingSummary(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -198,50 +232,97 @@ const PatientAppointmentDetail = () => {
           </CardContent>
         </Card>
 
-        {(appointment.transcription || hasRecording) && (
+        {(appointment.transcription || appointment.summary || hasRecording) && (
           <Card>
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-foreground">Recording Transcription</h2>
-                {!appointment.transcription && hasRecording && (
-                  <Button
-                    onClick={handleTranscribe}
-                    disabled={isTranscribing}
-                    size="sm"
-                    className="gap-2"
-                  >
-                    {isTranscribing ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Transcribing...
-                      </>
-                    ) : (
-                      <>
-                        <FileAudio className="h-4 w-4" />
-                        Transcribe Audio
-                      </>
-                    )}
-                  </Button>
-                )}
+                <h2 className="text-xl font-semibold text-foreground">Meeting Summary</h2>
+                <div className="flex gap-2">
+                  {!appointment.transcription && hasRecording && (
+                    <Button
+                      onClick={handleTranscribe}
+                      disabled={isTranscribing}
+                      size="sm"
+                      className="gap-2"
+                    >
+                      {isTranscribing ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Transcribing...
+                        </>
+                      ) : (
+                        <>
+                          <FileAudio className="h-4 w-4" />
+                          Transcribe Audio
+                        </>
+                      )}
+                    </Button>
+                  )}
+                  {appointment.transcription && !appointment.summary && (
+                    <Button
+                      onClick={handleGenerateSummary}
+                      disabled={isGeneratingSummary}
+                      size="sm"
+                      className="gap-2"
+                    >
+                      {isGeneratingSummary ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4" />
+                          Generate Summary
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
               </div>
               
               <div className="mb-6">
-                <p className="text-sm text-muted-foreground mb-2">Audio Recording</p>
-                <audio 
-                  controls 
-                  className={`w-full ${!audioUrl ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  {audioUrl && <source src={audioUrl} type="audio/webm" />}
-                  Your browser does not support the audio element.
-                </audio>
-                {!audioUrl && (
-                  <p className="text-xs text-muted-foreground mt-1">No recording available</p>
-                )}
+                <p className="text-sm text-muted-foreground mb-3">Audio Recording</p>
+                <CustomAudioPlayer audioUrl={audioUrl} />
               </div>
               
-              {appointment.transcription ? (
+              {appointment.summary ? (
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-3">Executive Summary</h3>
+                    <div className="prose max-w-none bg-muted/50 p-4 rounded-lg">
+                      <p className="text-foreground">{appointment.summary}</p>
+                    </div>
+                  </div>
+                  
+                  {appointment.transcription && (
+                    <div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowFullTranscript(!showFullTranscript)}
+                        className="mb-3"
+                      >
+                        {showFullTranscript ? "Hide" : "Show"} Full Transcript
+                      </Button>
+                      
+                      {showFullTranscript && (
+                        <div className="prose max-w-none border border-border p-4 rounded-lg">
+                          <p className="text-foreground whitespace-pre-wrap">{appointment.transcription}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : appointment.transcription ? (
                 <div className="prose max-w-none">
-                  <p className="text-foreground whitespace-pre-wrap">{appointment.transcription}</p>
+                  <p className="text-muted-foreground text-center py-4 mb-4">
+                    Click "Generate Summary" to create an executive summary of the transcription
+                  </p>
+                  <div className="border border-border p-4 rounded-lg">
+                    <h3 className="text-lg font-semibold text-foreground mb-3">Full Transcript</h3>
+                    <p className="text-foreground whitespace-pre-wrap">{appointment.transcription}</p>
+                  </div>
                 </div>
               ) : (
                 <p className="text-muted-foreground text-center py-8">

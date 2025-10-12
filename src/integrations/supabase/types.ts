@@ -26,6 +26,7 @@ export type Database = {
           notes: string | null
           patient_id: number
           status: string
+          summary: string | null
           transcription: string | null
           treatment: string
         }
@@ -40,6 +41,7 @@ export type Database = {
           notes?: string | null
           patient_id: number
           status?: string
+          summary?: string | null
           transcription?: string | null
           treatment: string
         }
@@ -54,6 +56,7 @@ export type Database = {
           notes?: string | null
           patient_id?: number
           status?: string
+          summary?: string | null
           transcription?: string | null
           treatment?: string
         }
