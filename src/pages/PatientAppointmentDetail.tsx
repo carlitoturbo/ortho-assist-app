@@ -31,6 +31,7 @@ const PatientAppointmentDetail = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [hasRecording, setHasRecording] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchAppointment = async () => {
@@ -67,7 +68,16 @@ const PatientAppointmentDetail = () => {
             .from("appointment-recordings")
             .list(`${appointmentId}/`, { limit: 1 });
           
-          setHasRecording(files && files.length > 0);
+          if (files && files.length > 0) {
+            setHasRecording(true);
+            
+            // Get the public URL for the audio file
+            const { data: urlData } = supabase.storage
+              .from("appointment-recordings")
+              .getPublicUrl(`${appointmentId}/${files[0].name}`);
+            
+            setAudioUrl(urlData.publicUrl);
+          }
         }
       } catch (error) {
         console.error("Error fetching appointment:", error);
@@ -193,7 +203,7 @@ const PatientAppointmentDetail = () => {
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-foreground">Recording Transcription</h2>
-                {!appointment.transcription && (
+                {!appointment.transcription && hasRecording && (
                   <Button
                     onClick={handleTranscribe}
                     disabled={isTranscribing}
@@ -214,6 +224,16 @@ const PatientAppointmentDetail = () => {
                   </Button>
                 )}
               </div>
+              
+              {audioUrl && (
+                <div className="mb-6">
+                  <p className="text-sm text-muted-foreground mb-2">Audio Recording</p>
+                  <audio controls className="w-full">
+                    <source src={audioUrl} type="audio/webm" />
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>
+              )}
               
               {appointment.transcription ? (
                 <div className="prose max-w-none">
