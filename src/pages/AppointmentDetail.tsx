@@ -259,45 +259,36 @@ const AppointmentDetail = () => {
 
                 <div className="pt-6 border-t border-border">
                   <ResizablePanelGroup direction="horizontal" className="min-h-[200px]">
-                    {appointment.notes && (
-                      <>
-                        <ResizablePanel defaultSize={66.67} minSize={30}>
-                          <div className="pr-8">
-                            <div className="flex items-center justify-between mb-4">
-                              <h3 className="text-lg font-semibold text-foreground">Pre-Appointment Information</h3>
-                              <AudioRecorder appointmentId={appointment.id} />
-                            </div>
+                    <ResizablePanel defaultSize={66.67} minSize={30}>
+                      <div className="pr-8 space-y-6">
+                        {appointment.notes && (
+                          <div>
+                            <h3 className="text-lg font-semibold text-foreground mb-4">Pre-Appointment Information</h3>
                             <p className="text-base text-foreground whitespace-pre-wrap">{appointment.notes}</p>
                           </div>
-                        </ResizablePanel>
-                        <ResizableHandle />
-                      </>
-                    )}
-                  </ResizablePanelGroup>
-                </div>
-
-                <div className="pt-6 border-t border-border">
-                  <ResizablePanelGroup direction="horizontal" className="min-h-[200px]">
-                    <ResizablePanel defaultSize={66.67} minSize={30}>
-                      <div className="pr-8">
-                        <div className="flex items-center justify-between mb-4">
-                          <h3 className="text-lg font-semibold text-foreground">Meeting Notes</h3>
-                          <Button
-                            onClick={saveMeetingNotes}
-                            disabled={isSaving}
-                            size="sm"
-                            className="gap-2"
-                          >
-                            <Save className="h-4 w-4" />
-                            {isSaving ? "Saving..." : "Save Notes"}
-                          </Button>
+                        )}
+                        
+                        <div>
+                          <h3 className="text-lg font-semibold text-foreground mb-4">Meeting Notes</h3>
+                          <Textarea
+                            value={meetingNotes}
+                            onChange={(e) => setMeetingNotes(e.target.value)}
+                            placeholder="Enter key points discussed during the appointment..."
+                            className="min-h-[150px] resize-y"
+                          />
+                          <div className="flex items-center justify-between mt-4">
+                            <AudioRecorder appointmentId={appointment.id} />
+                            <Button
+                              onClick={saveMeetingNotes}
+                              disabled={isSaving}
+                              size="sm"
+                              className="gap-2"
+                            >
+                              <Save className="h-4 w-4" />
+                              {isSaving ? "Saving..." : "Save Notes"}
+                            </Button>
+                          </div>
                         </div>
-                        <Textarea
-                          value={meetingNotes}
-                          onChange={(e) => setMeetingNotes(e.target.value)}
-                          placeholder="Enter key points discussed during the appointment..."
-                          className="min-h-[150px] resize-y"
-                        />
                       </div>
                     </ResizablePanel>
                     <ResizableHandle />
