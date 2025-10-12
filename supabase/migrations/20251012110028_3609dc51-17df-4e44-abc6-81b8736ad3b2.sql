@@ -1,0 +1,4 @@
+-- Add demo transcription to appointment ID 1
+UPDATE appointments 
+SET transcription = 'Patient arrived on time for their regular checkup. Started with visual examination of teeth and gums. No visible cavities detected. Gums appear healthy with no signs of inflammation or bleeding. Checked for plaque buildup - minimal accumulation noted on lower molars. Patient reports no pain or sensitivity. Flossing habits could be improved according to patient feedback. Recommended continuing twice-daily brushing routine. Scheduled next cleaning appointment for six months from now. Patient has no current concerns or questions about their oral health.'
+WHERE id = 1;
