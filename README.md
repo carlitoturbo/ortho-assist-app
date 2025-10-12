@@ -60,6 +60,14 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
+Additionally, whe used the following tools: 
+- lovable
+- supabase
+- n8n
+- twillio
+- openAI
+- livekit
+
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/b0a4c070-4369-45f9-8895-0ffca49b6086) and click on Share -> Publish.
