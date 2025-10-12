@@ -93,6 +93,13 @@ const PatientAppointmentDetail = () => {
     fetchAppointment();
   }, [appointmentId]);
 
+  // Auto-generate summary when transcription is available
+  useEffect(() => {
+    if (appointment?.transcription && !appointment.summary && !isGeneratingSummary) {
+      handleGenerateSummary();
+    }
+  }, [appointment?.transcription, appointment?.summary]);
+
   const handleTranscribe = async () => {
     if (!appointment) return;
     
@@ -237,48 +244,32 @@ const PatientAppointmentDetail = () => {
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-foreground">Meeting Summary</h2>
-                <div className="flex gap-2">
-                  {!appointment.transcription && hasRecording && (
-                    <Button
-                      onClick={handleTranscribe}
-                      disabled={isTranscribing}
-                      size="sm"
-                      className="gap-2"
-                    >
-                      {isTranscribing ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Transcribing...
-                        </>
-                      ) : (
-                        <>
-                          <FileAudio className="h-4 w-4" />
-                          Transcribe Audio
-                        </>
-                      )}
-                    </Button>
-                  )}
-                  {appointment.transcription && !appointment.summary && (
-                    <Button
-                      onClick={handleGenerateSummary}
-                      disabled={isGeneratingSummary}
-                      size="sm"
-                      className="gap-2"
-                    >
-                      {isGeneratingSummary ? (
-                        <>
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles className="h-4 w-4" />
-                          Generate Summary
-                        </>
-                      )}
-                    </Button>
-                  )}
-                </div>
+                {!appointment.transcription && hasRecording && (
+                  <Button
+                    onClick={handleTranscribe}
+                    disabled={isTranscribing}
+                    size="sm"
+                    className="gap-2"
+                  >
+                    {isTranscribing ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Transcribing...
+                      </>
+                    ) : (
+                      <>
+                        <FileAudio className="h-4 w-4" />
+                        Transcribe Audio
+                      </>
+                    )}
+                  </Button>
+                )}
+                {isGeneratingSummary && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Generating summary...
+                  </div>
+                )}
               </div>
               
               <div className="mb-6">
@@ -316,13 +307,17 @@ const PatientAppointmentDetail = () => {
                 </div>
               ) : appointment.transcription ? (
                 <div className="prose max-w-none">
-                  <p className="text-muted-foreground text-center py-4 mb-4">
-                    Click "Generate Summary" to create an executive summary of the transcription
-                  </p>
-                  <div className="border border-border p-4 rounded-lg">
-                    <h3 className="text-lg font-semibold text-foreground mb-3">Full Transcript</h3>
-                    <p className="text-foreground whitespace-pre-wrap">{appointment.transcription}</p>
-                  </div>
+                  {isGeneratingSummary ? (
+                    <div className="flex items-center justify-center py-8 text-muted-foreground">
+                      <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                      <span>Generating executive summary...</span>
+                    </div>
+                  ) : (
+                    <div className="border border-border p-4 rounded-lg">
+                      <h3 className="text-lg font-semibold text-foreground mb-3">Full Transcript</h3>
+                      <p className="text-foreground whitespace-pre-wrap">{appointment.transcription}</p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-muted-foreground text-center py-8">
