@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, Phone, Mail, ArrowLeft, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { AudioRecorder } from "@/components/AudioRecorder";
 
 interface AppointmentData {
   id: number;
@@ -221,7 +222,10 @@ const AppointmentDetail = () => {
                   <div className="grid grid-cols-2 gap-8 divide-x divide-border">
                     {appointment.notes && (
                       <div className="pr-8">
-                        <h3 className="text-lg font-semibold text-foreground mb-4">Notes</h3>
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-semibold text-foreground">Notes</h3>
+                          <AudioRecorder appointmentId={appointment.id} />
+                        </div>
                         <p className="text-base text-foreground whitespace-pre-wrap">{appointment.notes}</p>
                       </div>
                     )}

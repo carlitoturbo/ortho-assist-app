@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           appointment_date: string
           appointment_time: string
+          confirmation_sent: boolean | null
           created_at: string
           duration_minutes: number
           id: number
@@ -29,6 +30,7 @@ export type Database = {
         Insert: {
           appointment_date: string
           appointment_time: string
+          confirmation_sent?: boolean | null
           created_at?: string
           duration_minutes: number
           id?: number
@@ -40,6 +42,7 @@ export type Database = {
         Update: {
           appointment_date?: string
           appointment_time?: string
+          confirmation_sent?: boolean | null
           created_at?: string
           duration_minutes?: number
           id?: number
@@ -51,6 +54,32 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "appointments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calls: {
+        Row: {
+          created_at: string
+          id: number
+          patient_id: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          patient_id?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          patient_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calls_patient_id_fkey"
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
@@ -93,6 +122,70 @@ export type Database = {
           phone?: string | null
         }
         Relationships: []
+      }
+      questions: {
+        Row: {
+          id: number
+          question_text: string
+        }
+        Insert: {
+          id?: number
+          question_text: string
+        }
+        Update: {
+          id?: number
+          question_text?: string
+        }
+        Relationships: []
+      }
+      responses: {
+        Row: {
+          call_id: number | null
+          created_at: string | null
+          id: number
+          patient_id: number
+          question_id: number | null
+          response: string | null
+        }
+        Insert: {
+          call_id?: number | null
+          created_at?: string | null
+          id?: number
+          patient_id: number
+          question_id?: number | null
+          response?: string | null
+        }
+        Update: {
+          call_id?: number | null
+          created_at?: string | null
+          id?: number
+          patient_id?: number
+          question_id?: number | null
+          response?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "responses_call_id_fkey"
+            columns: ["call_id"]
+            isOneToOne: false
+            referencedRelation: "calls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "responses_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "responses_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       treatments: {
         Row: {
