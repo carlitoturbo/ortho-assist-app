@@ -67,14 +67,11 @@ Additionally, whe used the following tools:
 - openAI
 - livekit
 
----
 ## Overall explanation
 
 The Dental Agent System is a patient-centric automation platform designed to streamline the information intake, appointment scheduling, and treatment documentation process for dental practices. The system integrates **Lovable** as the front-end interface, **Supabase** as the backend database and file storage, and **n8n** for workflow automation. Calls are handled through **Cartesia’s LifeKit agent**, with communication managed via **Twilio**.
 
 Together, these components create a seamless experience — from the first patient call to the final treatment summary.
-
----
 
 ## System Architecture
 
@@ -83,8 +80,6 @@ Together, these components create a seamless experience — from the first patie
 **Automation Layer:** [n8n](https://n8n.io)
 **Telephony & AI Agent:** [LifeKit (Cartesia)](https://cartesia.ai)
 **Messaging Service:** [Twilio](https://www.twilio.com)
-
----
 
 ## Database Structure (Supabase)
 
@@ -96,8 +91,6 @@ The backend database is built on Supabase and includes several key tables and st
 * **recording buckets** — store audio/video recordings from each appointment.
 
 These tables are relationally linked, enabling the application to retrieve and display contextual information across patients, appointments, and treatments.
-
----
 
 ## Core Workflow
 
@@ -111,8 +104,6 @@ When a patient calls through **LifeKit**, the agent:
 
 If the patient is new, a record is created automatically in the `patients` table.
 
----
-
 ### 2. Scheduling & Database Update
 
 During the call, the agent schedules the appointment and records the conversation.
@@ -123,7 +114,6 @@ Once the call ends:
 
 This pending appointment is now visible in the **Lovable** front-end.
 
----
 
 ### 3. Appointment Approval Workflow
 
@@ -135,7 +125,6 @@ Based on their decision:
 
 All communication triggers and state updates are handled through **n8n** automation workflows.
 
----
 
 ### 4. Appointment Recording & Storage
 
@@ -144,7 +133,6 @@ When the appointment takes place:
 * The user can start a recording directly in the Lovable interface.
 * The audio/video file is uploaded to Supabase storage buckets and linked to the relevant appointment entry.
 
----
 
 ### 5. AI-Powered Transcription & Summary
 
@@ -155,7 +143,6 @@ After the recording is complete:
 
 This summary becomes visible in the patient's appointment history for quick review.
 
----
 
 ## Data Flow Summary
 
@@ -180,7 +167,6 @@ OpenAI → transcription + summary
 Lovable → display appointment details + summary
 ```
 
----
 
 ## Key Features
 
@@ -190,7 +176,6 @@ Lovable → display appointment details + summary
 * **Fully automated communication** through n8n and Twilio.
 * **Scalable backend design** supporting additional tables and event triggers.
 
----
 
 
 ## How can I deploy this project?
