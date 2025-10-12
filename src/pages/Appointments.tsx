@@ -232,6 +232,8 @@ const Appointments = () => {
                             className={
                               apt.status === "confirmed"
                                 ? "bg-green-100 text-green-800 hover:bg-green-100"
+                                : apt.status === "declined"
+                                ? "bg-gray-100 text-gray-800 hover:bg-gray-100"
                                 : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
                             }
                           >

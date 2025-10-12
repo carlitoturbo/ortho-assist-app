@@ -95,7 +95,7 @@ const Dashboard = () => {
                     <div className="text-sm text-muted-foreground">{apt.treatment}</div>
                   </div>
                 </div>
-                <div className={`rounded-full px-3 py-1 text-xs font-medium ${apt.status === "confirmed" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}>
+                <div className={`rounded-full px-3 py-1 text-xs font-medium ${apt.status === "confirmed" ? "bg-green-100 text-green-800" : apt.status === "declined" ? "bg-gray-100 text-gray-800" : "bg-yellow-100 text-yellow-800"}`}>
                   {apt.status}
                 </div>
               </div>)}
