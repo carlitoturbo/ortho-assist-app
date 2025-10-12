@@ -3,11 +3,13 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, Phone, Mail, ArrowLeft, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar, Phone, Mail, ArrowLeft, Clock, ChevronDown, ChevronUp, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { AudioRecorder } from "@/components/AudioRecorder";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 interface AppointmentData {
   id: number;
@@ -17,6 +19,7 @@ interface AppointmentData {
   status: string;
   duration_minutes: number;
   notes: string | null;
+  meeting_notes: string | null;
   patient?: {
     first_name: string | null;
     last_name: string | null;
@@ -36,10 +39,13 @@ interface Treatment {
 const AppointmentDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [appointment, setAppointment] = useState<AppointmentData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [treatments, setTreatments] = useState<Treatment[]>([]);
   const [showAllTreatments, setShowAllTreatments] = useState(false);
+  const [meetingNotes, setMeetingNotes] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const fetchAppointment = async () => {
@@ -74,6 +80,7 @@ const AppointmentDetail = () => {
               : appointmentData.patient
           };
           setAppointment(transformedData as AppointmentData);
+          setMeetingNotes(appointmentData.meeting_notes || "");
 
           // Fetch treatments for this patient
           const { data: treatmentsData, error: treatmentsError } = await supabase
@@ -98,6 +105,37 @@ const AppointmentDetail = () => {
   }, [id]);
 
   const displayedTreatments = showAllTreatments ? treatments : treatments.slice(0, 3);
+
+  const saveMeetingNotes = async () => {
+    if (!appointment) return;
+    
+    setIsSaving(true);
+    try {
+      const { error } = await supabase
+        .from("appointments")
+        .update({ meeting_notes: meetingNotes.trim() })
+        .eq("id", appointment.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Meeting notes saved",
+        description: "Your notes have been saved successfully.",
+      });
+
+      // Update local state
+      setAppointment({ ...appointment, meeting_notes: meetingNotes.trim() });
+    } catch (error) {
+      console.error("Error saving meeting notes:", error);
+      toast({
+        title: "Error saving notes",
+        description: "Failed to save meeting notes. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -282,6 +320,29 @@ const AppointmentDetail = () => {
                       </div>
                     </ResizablePanel>
                   </ResizablePanelGroup>
+                </div>
+
+                <div className="pt-6 border-t border-border">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-foreground">Meeting Notes</h3>
+                      <Button
+                        onClick={saveMeetingNotes}
+                        disabled={isSaving}
+                        size="sm"
+                        className="gap-2"
+                      >
+                        <Save className="h-4 w-4" />
+                        {isSaving ? "Saving..." : "Save Notes"}
+                      </Button>
+                    </div>
+                    <Textarea
+                      value={meetingNotes}
+                      onChange={(e) => setMeetingNotes(e.target.value)}
+                      placeholder="Enter key points discussed during the appointment..."
+                      className="min-h-[150px] resize-y"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
