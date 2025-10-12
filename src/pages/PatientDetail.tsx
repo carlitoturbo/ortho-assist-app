@@ -4,9 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Calendar, Clock, Loader2 } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Loader2, Search, Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Patient {
   id: number;
@@ -33,6 +36,9 @@ const PatientDetail = () => {
   const [patient, setPatient] = useState<Patient | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [treatmentFilter, setTreatmentFilter] = useState("all");
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -68,6 +74,28 @@ const PatientDetail = () => {
 
     fetchPatientData();
   }, [id]);
+
+  // Calculate unique treatments
+  const uniqueTreatments = Array.from(new Set(appointments.map(apt => apt.treatment)));
+
+  // Filter appointments
+  const filteredAppointments = appointments.filter((appointment) => {
+    const matchesSearch = appointment.treatment.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === "all" || appointment.status === statusFilter;
+    const matchesTreatment = treatmentFilter === "all" || appointment.treatment === treatmentFilter;
+    return matchesSearch && matchesStatus && matchesTreatment;
+  });
+
+  // Count active filters
+  const activeFiltersCount = [
+    statusFilter !== "all",
+    treatmentFilter !== "all",
+  ].filter(Boolean).length;
+
+  const handleClearFilters = () => {
+    setStatusFilter("all");
+    setTreatmentFilter("all");
+  };
 
   if (isLoading) {
     return (
@@ -145,9 +173,80 @@ const PatientDetail = () => {
 
         <Card>
           <CardContent className="p-8">
-            <h2 className="text-xl font-semibold text-foreground mb-6">Appointments</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-foreground">Appointments</h2>
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Search by treatment..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9 w-64"
+                  />
+                </div>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="relative">
+                      <Filter className="h-4 w-4 mr-2" />
+                      Filters
+                      {activeFiltersCount > 0 && (
+                        <Badge variant="secondary" className="ml-2 h-5 w-5 p-0 flex items-center justify-center rounded-full">
+                          {activeFiltersCount}
+                        </Badge>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Status</label>
+                        <Select value={statusFilter} onValueChange={setStatusFilter}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Statuses</SelectItem>
+                            <SelectItem value="confirmed">Confirmed</SelectItem>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="declined">Declined</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Treatment</label>
+                        <Select value={treatmentFilter} onValueChange={setTreatmentFilter}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Treatments</SelectItem>
+                            {uniqueTreatments.map((treatment) => (
+                              <SelectItem key={treatment} value={treatment}>
+                                {treatment}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {activeFiltersCount > 0 && (
+                        <Button
+                          variant="outline"
+                          onClick={handleClearFilters}
+                          className="w-full"
+                        >
+                          Clear Filters
+                        </Button>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
             {appointments.length === 0 ? (
               <p className="text-muted-foreground text-center py-8">No appointments found for this patient</p>
+            ) : filteredAppointments.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">No appointments match your filters</p>
             ) : (
               <Table>
                 <TableHeader>
@@ -160,7 +259,7 @@ const PatientDetail = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {appointments.map((appointment) => (
+                  {filteredAppointments.map((appointment) => (
                     <TableRow
                       key={appointment.id}
                       className="cursor-pointer hover:bg-muted/50"
