@@ -1,4 +1,4 @@
-import { LayoutDashboard, Calendar, Clock, Settings } from "lucide-react";
+import { LayoutDashboard, Calendar, Clock, Settings, Users } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import {
   Sidebar,
@@ -12,6 +12,7 @@ import {
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Patients", url: "/patients", icon: Users },
   { title: "Upcoming Appointments", url: "/appointments", icon: Calendar },
   { title: "Appointment Planning", url: "/planning", icon: Clock },
   { title: "Settings", url: "/settings", icon: Settings },
