@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { Search, Phone, Mail, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, Phone, Mail, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AppointmentsDayCalendar } from "@/components/AppointmentsDayCalendar";
 import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,6 +35,9 @@ const Appointments = () => {
   const [appointments, setAppointments] = useState<AppointmentType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const appointmentRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [treatmentFilter, setTreatmentFilter] = useState<string>("all");
 
   useEffect(() => {
     fetchAppointments();
@@ -52,7 +56,6 @@ const Appointments = () => {
             mail
           )
         `)
-        .neq("status", "declined")
         .order("appointment_date", { ascending: true })
         .order("appointment_time", { ascending: true });
 
@@ -97,7 +100,36 @@ const Appointments = () => {
   };
 
   const selectedDateStr = format(selectedDate, "yyyy-MM-dd");
-  const dayAppointments = appointments.filter((apt) => apt.date === selectedDateStr);
+  
+  // Get unique treatments for filter
+  const uniqueTreatments = Array.from(new Set(appointments.map(apt => apt.treatment))).sort();
+  
+  // Apply all filters
+  const dayAppointments = appointments
+    .filter((apt) => apt.date === selectedDateStr)
+    .filter((apt) => {
+      // Search filter
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        return (
+          apt.patient.toLowerCase().includes(query) ||
+          apt.treatment.toLowerCase().includes(query) ||
+          apt.phone.toLowerCase().includes(query) ||
+          apt.email.toLowerCase().includes(query)
+        );
+      }
+      return true;
+    })
+    .filter((apt) => {
+      // Status filter
+      if (statusFilter === "all") return true;
+      return apt.status === statusFilter;
+    })
+    .filter((apt) => {
+      // Treatment filter
+      if (treatmentFilter === "all") return true;
+      return apt.treatment === treatmentFilter;
+    });
 
   useEffect(() => {
     if (highlightedId && appointmentRefs.current[highlightedId]) {
@@ -138,9 +170,75 @@ const Appointments = () => {
           <h1 className="text-3xl font-bold text-foreground">Appointments</h1>
           <p className="text-muted-foreground mt-1">View and manage scheduled appointments</p>
         </div>
-        <div className="relative w-64">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search patients..." className="pl-9" />
+        <div className="flex items-center gap-3">
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input 
+              placeholder="Search patients..." 
+              className="pl-9" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <Filter className="h-4 w-4" />
+                Filters
+                {(statusFilter !== "all" || treatmentFilter !== "all") && (
+                  <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                    {[statusFilter !== "all", treatmentFilter !== "all"].filter(Boolean).length}
+                  </Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 bg-background" align="end">
+              <div className="space-y-4">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Status</label>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="bg-background">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background">
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="confirmed">Confirmed</SelectItem>
+                      <SelectItem value="pending">Pending</SelectItem>
+                      <SelectItem value="declined">Declined</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Treatment</label>
+                  <Select value={treatmentFilter} onValueChange={setTreatmentFilter}>
+                    <SelectTrigger className="bg-background">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background">
+                      <SelectItem value="all">All Treatments</SelectItem>
+                      {uniqueTreatments.map((treatment) => (
+                        <SelectItem key={treatment} value={treatment}>
+                          {treatment}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {(statusFilter !== "all" || treatmentFilter !== "all") && (
+                  <Button
+                    variant="ghost"
+                    className="w-full"
+                    onClick={() => {
+                      setStatusFilter("all");
+                      setTreatmentFilter("all");
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
