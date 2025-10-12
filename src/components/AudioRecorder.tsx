@@ -295,6 +295,17 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
     return (
       <>
         <div className="flex items-center gap-2">
+          {audioRef.current && (
+            <Button
+              onClick={skipBackward}
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+            >
+              <SkipBack className="h-3 w-3" />
+            </Button>
+          )}
+          
           <Button
             onClick={isPlaying ? pausePlayback : (audioRef.current ? resumePlayback : playRecording)}
             variant="outline"
@@ -306,26 +317,14 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
           </Button>
           
           {audioRef.current && (
-            <>
-              <Button
-                onClick={skipBackward}
-                variant="outline"
-                size="sm"
-                className="gap-2"
-              >
-                <SkipBack className="h-4 w-4" />
-                -15s
-              </Button>
-              <Button
-                onClick={skipForward}
-                variant="outline"
-                size="sm"
-                className="gap-2"
-              >
-                <SkipForward className="h-4 w-4" />
-                +15s
-              </Button>
-            </>
+            <Button
+              onClick={skipForward}
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+            >
+              <SkipForward className="h-3 w-3" />
+            </Button>
           )}
           
           <Button
