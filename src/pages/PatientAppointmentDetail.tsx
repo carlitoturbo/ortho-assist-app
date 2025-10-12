@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 import { CustomAudioPlayer } from "@/components/CustomAudioPlayer";
+import ReactMarkdown from "react-markdown";
 
 interface AppointmentData {
   id: number;
@@ -281,8 +282,8 @@ const PatientAppointmentDetail = () => {
                 <div className="space-y-4">
                   <div>
                     <h3 className="text-lg font-semibold text-foreground mb-3">Executive Summary</h3>
-                    <div className="prose max-w-none bg-muted/50 p-4 rounded-lg">
-                      <p className="text-foreground">{appointment.summary}</p>
+                    <div className="prose prose-sm max-w-none bg-muted/50 p-4 rounded-lg text-foreground">
+                      <ReactMarkdown>{appointment.summary}</ReactMarkdown>
                     </div>
                   </div>
                   
@@ -298,8 +299,8 @@ const PatientAppointmentDetail = () => {
                       </Button>
                       
                       {showFullTranscript && (
-                        <div className="prose max-w-none border border-border p-4 rounded-lg">
-                          <p className="text-foreground whitespace-pre-wrap">{appointment.transcription}</p>
+                        <div className="prose prose-sm max-w-none border border-border p-4 rounded-lg text-foreground">
+                          <ReactMarkdown>{appointment.transcription}</ReactMarkdown>
                         </div>
                       )}
                     </div>
@@ -315,7 +316,9 @@ const PatientAppointmentDetail = () => {
                   ) : (
                     <div className="border border-border p-4 rounded-lg">
                       <h3 className="text-lg font-semibold text-foreground mb-3">Full Transcript</h3>
-                      <p className="text-foreground whitespace-pre-wrap">{appointment.transcription}</p>
+                      <div className="prose prose-sm max-w-none text-foreground">
+                        <ReactMarkdown>{appointment.transcription}</ReactMarkdown>
+                      </div>
                     </div>
                   )}
                 </div>
