@@ -94,6 +94,13 @@ const PatientAppointmentDetail = () => {
     fetchAppointment();
   }, [appointmentId]);
 
+  // Auto-transcribe when recording is available
+  useEffect(() => {
+    if (hasRecording && !appointment?.transcription && !isTranscribing) {
+      handleTranscribe();
+    }
+  }, [hasRecording, appointment?.transcription]);
+
   // Auto-generate summary when transcription is available
   useEffect(() => {
     if (appointment?.transcription && !appointment.summary && !isGeneratingSummary) {
@@ -245,30 +252,10 @@ const PatientAppointmentDetail = () => {
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-foreground">Meeting Summary</h2>
-                {!appointment.transcription && hasRecording && (
-                  <Button
-                    onClick={handleTranscribe}
-                    disabled={isTranscribing}
-                    size="sm"
-                    className="gap-2"
-                  >
-                    {isTranscribing ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Transcribing...
-                      </>
-                    ) : (
-                      <>
-                        <FileAudio className="h-4 w-4" />
-                        Transcribe Audio
-                      </>
-                    )}
-                  </Button>
-                )}
-                {isGeneratingSummary && (
+                {(isTranscribing || isGeneratingSummary) && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Generating summary...
+                    {isTranscribing ? "Transcribing audio..." : "Generating summary..."}
                   </div>
                 )}
               </div>
@@ -322,9 +309,14 @@ const PatientAppointmentDetail = () => {
                     </div>
                   )}
                 </div>
+              ) : isTranscribing ? (
+                <div className="flex items-center justify-center py-8 text-muted-foreground">
+                  <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                  <span>Transcribing audio recording...</span>
+                </div>
               ) : (
                 <p className="text-muted-foreground text-center py-8">
-                  Click "Transcribe Audio" to generate a text transcript of the recording
+                  Processing recording...
                 </p>
               )}
             </CardContent>
