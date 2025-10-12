@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, Search } from "lucide-react";
 
 interface Patient {
   id: number;
@@ -18,6 +19,7 @@ const Patients = () => {
   const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -39,6 +41,15 @@ const Patients = () => {
     fetchPatients();
   }, []);
 
+  const filteredPatients = patients.filter((patient) => {
+    const fullName = `${patient.first_name || ""} ${patient.last_name || ""}`.toLowerCase();
+    const phone = patient.phone?.toLowerCase() || "";
+    const email = patient.mail?.toLowerCase() || "";
+    const search = searchTerm.toLowerCase();
+    
+    return fullName.includes(search) || phone.includes(search) || email.includes(search);
+  });
+
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
@@ -57,6 +68,17 @@ const Patients = () => {
           </div>
         </div>
 
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search patients by name, phone, or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+
         <Card>
           <CardContent className="p-0">
             <Table>
@@ -65,18 +87,17 @@ const Patients = () => {
                   <TableHead>Name</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Birth Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {patients.length === 0 ? (
+                {filteredPatients.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center text-muted-foreground">
-                      No patients found
+                    <TableCell colSpan={3} className="text-center text-muted-foreground">
+                      {searchTerm ? "No patients found matching your search" : "No patients found"}
                     </TableCell>
                   </TableRow>
                 ) : (
-                  patients.map((patient) => (
+                  filteredPatients.map((patient) => (
                     <TableRow
                       key={patient.id}
                       className="cursor-pointer hover:bg-muted/50"
@@ -89,11 +110,6 @@ const Patients = () => {
                       </TableCell>
                       <TableCell>{patient.phone || "N/A"}</TableCell>
                       <TableCell>{patient.mail || "N/A"}</TableCell>
-                      <TableCell>
-                        {patient.birth_date
-                          ? new Date(patient.birth_date).toLocaleDateString()
-                          : "N/A"}
-                      </TableCell>
                     </TableRow>
                   ))
                 )}
