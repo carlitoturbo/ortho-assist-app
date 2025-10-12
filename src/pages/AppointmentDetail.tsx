@@ -260,7 +260,7 @@ const AppointmentDetail = () => {
                 <div className="pt-6 border-t border-border">
                   <ResizablePanelGroup direction="horizontal" className="min-h-[200px]">
                     <ResizablePanel defaultSize={66.67} minSize={30}>
-                      <div className="pr-8 space-y-6">
+                      <div className="pr-10 space-y-6">
                         {appointment.notes && (
                           <div>
                             <h3 className="text-lg font-semibold text-foreground mb-4">Pre-Appointment Information</h3>
@@ -268,13 +268,13 @@ const AppointmentDetail = () => {
                           </div>
                         )}
                         
-                        <div>
+                        <div className="relative">
                           <h3 className="text-lg font-semibold text-foreground mb-4">Meeting Notes</h3>
                           <Textarea
                             value={meetingNotes}
                             onChange={(e) => setMeetingNotes(e.target.value)}
                             placeholder="Enter key points discussed during the appointment..."
-                            className="min-h-[150px] resize-y"
+                            className="min-h-[150px] resize-y w-full"
                           />
                           <div className="flex items-center justify-between mt-4">
                             <AudioRecorder appointmentId={appointment.id} />
