@@ -1,0 +1,21 @@
+# Twilio Configuration
+TWILIO_ACCOUNT_SID=AC4f8fe9d9a1df5285f9d9250dd97b2b0e
+TWILIO_AUTH_TOKEN=your_auth_token_here
+TWILIO_PHONE_NUMBER=+4915203225863
+
+# LiveKit Configuration
+LIVEKIT_URL=wss://your-livekit-server.com
+LIVEKIT_API_KEY=your_livekit_api_key
+LIVEKIT_API_SECRET=your_livekit_api_secret
+
+# Webhook Server Configuration
+WEBHOOK_HOST=0.0.0.0
+WEBHOOK_PORT=8000
+WEBHOOK_BASE_URL=https://your-domain.com
+
+# Supabase Configuration (for your existing agent)
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+
+# OpenAI Configuration (for LLM calls)
+OPENAI_API_KEY=your_openai_api_key
