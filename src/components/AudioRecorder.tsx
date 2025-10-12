@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Mic, Square, Loader2, Pause, Play, Save } from "lucide-react";
+import { Mic, Square, Loader2, Pause, Play, Save, SkipBack, SkipForward } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,6 +15,7 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
   const [isSaving, setIsSaving] = useState(false);
   const [existingRecording, setExistingRecording] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -22,6 +23,13 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
 
   useEffect(() => {
     checkExistingRecording();
+    
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
   }, [appointmentId]);
 
   const checkExistingRecording = async () => {
@@ -119,12 +127,37 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
     if (existingRecording) {
       if (!audioRef.current) {
         audioRef.current = new Audio(existingRecording);
+        
+        audioRef.current.addEventListener('play', () => setIsPlaying(true));
+        audioRef.current.addEventListener('pause', () => setIsPlaying(false));
+        audioRef.current.addEventListener('ended', () => setIsPlaying(false));
       }
       audioRef.current.play();
       toast({
         title: "Playing recording",
         description: "Audio playback started",
       });
+    }
+  };
+
+  const pausePlayback = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+  };
+
+  const skipBackward = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 15);
+    }
+  };
+
+  const skipForward = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = Math.min(
+        audioRef.current.duration,
+        audioRef.current.currentTime + 15
+      );
     }
   };
 
@@ -195,15 +228,49 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
 
   if (existingRecording && !isRecording) {
     return (
-      <Button
-        onClick={playRecording}
-        variant="outline"
-        size="sm"
-        className="gap-2"
-      >
-        <Play className="h-4 w-4" />
-        Play Recording
-      </Button>
+      <div className="flex items-center gap-2">
+        {!isPlaying ? (
+          <Button
+            onClick={playRecording}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+          >
+            <Play className="h-4 w-4" />
+            Play
+          </Button>
+        ) : (
+          <>
+            <Button
+              onClick={pausePlayback}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <Pause className="h-4 w-4" />
+              Pause
+            </Button>
+            <Button
+              onClick={skipBackward}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <SkipBack className="h-4 w-4" />
+              -15s
+            </Button>
+            <Button
+              onClick={skipForward}
+              variant="outline"
+              size="sm"
+              className="gap-2"
+            >
+              <SkipForward className="h-4 w-4" />
+              +15s
+            </Button>
+          </>
+        )}
+      </div>
     );
   }
 
