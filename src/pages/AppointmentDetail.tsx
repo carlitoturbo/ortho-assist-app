@@ -273,9 +273,36 @@ const AppointmentDetail = () => {
                         <ResizableHandle />
                       </>
                     )}
-                    
-                    <ResizablePanel defaultSize={appointment.notes ? 33.33 : 100} minSize={20}>
-                      <div className={appointment.notes ? "pl-8" : ""}>
+                  </ResizablePanelGroup>
+                </div>
+
+                <div className="pt-6 border-t border-border">
+                  <ResizablePanelGroup direction="horizontal" className="min-h-[200px]">
+                    <ResizablePanel defaultSize={66.67} minSize={30}>
+                      <div className="pr-8">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg font-semibold text-foreground">Meeting Notes</h3>
+                          <Button
+                            onClick={saveMeetingNotes}
+                            disabled={isSaving}
+                            size="sm"
+                            className="gap-2"
+                          >
+                            <Save className="h-4 w-4" />
+                            {isSaving ? "Saving..." : "Save Notes"}
+                          </Button>
+                        </div>
+                        <Textarea
+                          value={meetingNotes}
+                          onChange={(e) => setMeetingNotes(e.target.value)}
+                          placeholder="Enter key points discussed during the appointment..."
+                          className="min-h-[150px] resize-y"
+                        />
+                      </div>
+                    </ResizablePanel>
+                    <ResizableHandle />
+                    <ResizablePanel defaultSize={33.33} minSize={20}>
+                      <div className="pl-8">
                         <div className="flex items-center justify-between mb-4">
                           <h3 className="text-lg font-semibold text-foreground">Previous Treatments</h3>
                           {treatments.length > 3 && (
@@ -320,29 +347,6 @@ const AppointmentDetail = () => {
                       </div>
                     </ResizablePanel>
                   </ResizablePanelGroup>
-                </div>
-
-                <div className="pt-6 border-t border-border">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-semibold text-foreground">Meeting Notes</h3>
-                      <Button
-                        onClick={saveMeetingNotes}
-                        disabled={isSaving}
-                        size="sm"
-                        className="gap-2"
-                      >
-                        <Save className="h-4 w-4" />
-                        {isSaving ? "Saving..." : "Save Notes"}
-                      </Button>
-                    </div>
-                    <Textarea
-                      value={meetingNotes}
-                      onChange={(e) => setMeetingNotes(e.target.value)}
-                      placeholder="Enter key points discussed during the appointment..."
-                      className="min-h-[150px] resize-y"
-                    />
-                  </div>
                 </div>
               </div>
             </div>
