@@ -2,3 +2,6 @@ project_id = "yvyerqzfxctqhsgyghta"
 
 [functions.transcribe-audio]
 verify_jwt = false
+
+[functions.seed-demo-audio]
+verify_jwt = false

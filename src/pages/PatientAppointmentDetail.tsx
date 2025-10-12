@@ -225,15 +225,19 @@ const PatientAppointmentDetail = () => {
                 )}
               </div>
               
-              {audioUrl && (
-                <div className="mb-6">
-                  <p className="text-sm text-muted-foreground mb-2">Audio Recording</p>
-                  <audio controls className="w-full">
-                    <source src={audioUrl} type="audio/webm" />
-                    Your browser does not support the audio element.
-                  </audio>
-                </div>
-              )}
+              <div className="mb-6">
+                <p className="text-sm text-muted-foreground mb-2">Audio Recording</p>
+                <audio 
+                  controls 
+                  className={`w-full ${!audioUrl ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {audioUrl && <source src={audioUrl} type="audio/webm" />}
+                  Your browser does not support the audio element.
+                </audio>
+                {!audioUrl && (
+                  <p className="text-xs text-muted-foreground mt-1">No recording available</p>
+                )}
+              </div>
               
               {appointment.transcription ? (
                 <div className="prose max-w-none">
