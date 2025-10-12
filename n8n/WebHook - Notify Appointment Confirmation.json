@@ -1,0 +1,395 @@
+{
+  "name": "WebHook - Notify Appointment Confirmation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -624,
+        -128
+      ],
+      "id": "7fc00778-a292-4677-ad47-ce6aeb6b0fd6",
+      "name": "Webhook",
+      "webhookId": "a1bdab27-c1ab-4842-a79d-8a845efe5262"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "78e41894-a42e-458d-9b5e-4cf5bf6ea734",
+              "leftValue": "={{ $json.body.record.confirmation_sent }}",
+              "rightValue": "={{ true }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -416,
+        -128
+      ],
+      "id": "1e7909b8-a345-4050-b170-e94c956ba139",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.record.status }}",
+                    "rightValue": "confirmed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "394fb92b-26e3-4150-9362-20c08475d1e5"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "confirmed"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f5d5d391-bdeb-4fea-9424-fef0928ba75b",
+                    "leftValue": "={{ $('Webhook').item.json.body.record.status }}",
+                    "rightValue": "declined",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "declined"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        48,
+        -144
+      ],
+      "id": "0aa66359-9d29-4dba-8f1e-6a84eaa3444f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "patients",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.body.record.patient_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -144
+      ],
+      "id": "86020fe9-c116-43e7-ac5b-6b1a1fdaf4bc",
+      "name": "Get a row - Patient",
+      "credentials": {
+        "supabaseApi": {
+          "id": "FjArWpdvkXrt4HxS",
+          "name": "Supabase - Nelly"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "appointments",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook').item.json.body.record.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "confirmation_sent",
+              "fieldValue": "={{ true }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        704,
+        -128
+      ],
+      "id": "55ae3745-4483-4213-97d1-5f8676b7d040",
+      "name": "Update a row - Change Notificacion Sent Flag",
+      "credentials": {
+        "supabaseApi": {
+          "id": "FjArWpdvkXrt4HxS",
+          "name": "Supabase - Nelly"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "+12293746942",
+        "to": "=+4915203225863",
+        "message": "=Hey {{ $('Get a row - Patient').item.json.first_name }}! Your appointment for {{ new Date(($('Webhook').item.json.body.record.appointment_date + \"T\" + $('Webhook').item.json.body.record.appointment_time)\n).toLocaleString(\"en-GB\", {\n  day: \"2-digit\",\n  month: \"long\",\n  hour: \"2-digit\",\n  minute: \"2-digit\",\n  hour12: false,\n})\n }} HS has been declined. Reach us again, if you would like to set a new one.\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -32
+      ],
+      "id": "161bc2df-9362-48b8-a397-0d154d561e21",
+      "name": "Send Declined SMS",
+      "credentials": {
+        "twilioApi": {
+          "id": "PRi6gTFd8Vd7hsHN",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "+12293746942",
+        "to": "=+4915203225863",
+        "message": "=Hey {{ $('Get a row - Patient').item.json.first_name }}! You have an appointment on {{ new Date(($('Webhook').item.json.body.record.appointment_date + \"T\" + $('Webhook').item.json.body.record.appointment_time)\n).toLocaleString(\"en-GB\", {\n  day: \"2-digit\",\n  month: \"long\",\n  hour: \"2-digit\",\n  minute: \"2-digit\",\n  hour12: false,\n})\n }} HS. If don't show up a puppy will be killed horribly.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -240
+      ],
+      "id": "54ee93bc-285c-4dd2-bc53-aa7707a08e3d",
+      "name": "Send an Accepted SMS",
+      "credentials": {
+        "twilioApi": {
+          "id": "PRi6gTFd8Vd7hsHN",
+          "name": "Twilio account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "As this is a free Twillio account, only the account owner can receive SMS",
+        "height": 528
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        304,
+        -400
+      ],
+      "typeVersion": 1,
+      "id": "65566d14-670e-4191-9e36-5cb870d15258",
+      "name": "Sticky Note"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "benjooo.app.n8n.cloud",
+            "user-agent": "pg_net/0.19.5",
+            "content-length": "1846",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "2a05:d016:571:a40c:f87c:661f:e502:624",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "SE",
+            "cf-ray": "98d5f8fc47734453-ARN",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "2a05:d016:571:a40c:f87c:661f:e502:624, 104.23.221.129",
+            "x-forwarded-host": "benjooo.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-52-6c4f4684d5-tchs5",
+            "x-is-trusted": "yes",
+            "x-real-ip": "2a05:d016:571:a40c:f87c:661f:e502:624"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "type": "UPDATE",
+            "table": "appointments",
+            "record": {
+              "id": 26,
+              "notes": "**Executive Summary:**\n\n- **Condition:** No current medical conditions reported.\n- **Pain:** No pain reported, duration, or severity noted.\n- **Previous Treatments:** No history of treatments or interventions.\n- **Allergies:** None documented.\n- **Medications:** Patient is not on any medications.\n\n**Urgency Indicators:** None present. \n\n**Considerations:** Since the patient reports no issues, focus on preventive care and wellness during the appointment. Consider discussing lifestyle factors and screening recommendations. No immediate red flags detected.",
+              "status": "declined",
+              "treatment": "Black spot on front teeth, pain level 5",
+              "created_at": "2025-10-12T09:50:12.529129+00:00",
+              "patient_id": 1,
+              "meeting_notes": null,
+              "appointment_date": "2025-10-13",
+              "appointment_time": "11:30:00",
+              "duration_minutes": 30,
+              "confirmation_sent": false
+            },
+            "schema": "public",
+            "old_record": {
+              "id": 26,
+              "notes": "**Executive Summary:**\n\n- **Condition:** No current medical conditions reported.\n- **Pain:** No pain reported, duration, or severity noted.\n- **Previous Treatments:** No history of treatments or interventions.\n- **Allergies:** None documented.\n- **Medications:** Patient is not on any medications.\n\n**Urgency Indicators:** None present. \n\n**Considerations:** Since the patient reports no issues, focus on preventive care and wellness during the appointment. Consider discussing lifestyle factors and screening recommendations. No immediate red flags detected.",
+              "status": "pending",
+              "treatment": "Black spot on front teeth, pain level 5",
+              "created_at": "2025-10-12T09:50:12.529129+00:00",
+              "patient_id": 1,
+              "meeting_notes": null,
+              "appointment_date": "2025-10-13",
+              "appointment_time": "11:30:00",
+              "duration_minutes": 30,
+              "confirmation_sent": false
+            }
+          },
+          "webhookUrl": "https://benjooo.app.n8n.cloud/webhook-test/status",
+          "executionMode": "test"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get a row - Patient",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send an Accepted SMS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Declined SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row - Patient": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Declined SMS": {
+      "main": [
+        [
+          {
+            "node": "Update a row - Change Notificacion Sent Flag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an Accepted SMS": {
+      "main": [
+        [
+          {
+            "node": "Update a row - Change Notificacion Sent Flag",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "47f91c82-2bd8-48e6-a2c2-bcd7fd29ecd7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d51ca22069fa6a901d5b549d6d342b551ab3d51c96709593dfc371eb1a9afca6"
+  },
+  "id": "3ory5U8MGQ04cFDK",
+  "tags": []
+}
