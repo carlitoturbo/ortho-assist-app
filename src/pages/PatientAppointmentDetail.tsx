@@ -188,7 +188,7 @@ const PatientAppointmentDetail = () => {
           </CardContent>
         </Card>
 
-        {hasRecording && (
+        {(appointment.transcription || hasRecording) && (
           <Card>
             <CardContent className="p-8">
               <div className="flex items-center justify-between mb-6">
