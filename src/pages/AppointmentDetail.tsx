@@ -260,7 +260,7 @@ const AppointmentDetail = () => {
                 <div className="pt-6 border-t border-border">
                   <ResizablePanelGroup direction="horizontal" className="min-h-[200px]">
                     <ResizablePanel defaultSize={66.67} minSize={30}>
-                      <div className="pr-10 space-y-6">
+                      <div className="px-2 pr-10 space-y-6">
                         {appointment.notes && (
                           <div>
                             <h3 className="text-lg font-semibold text-foreground mb-4">Pre-Appointment Information</h3>
