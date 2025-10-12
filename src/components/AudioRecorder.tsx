@@ -141,10 +141,13 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
         audioRef.current = new Audio(existingRecording);
         
         audioRef.current.addEventListener('play', () => setIsPlaying(true));
-        audioRef.current.addEventListener('pause', () => setIsPlaying(false));
+        audioRef.current.addEventListener('pause', () => {
+          // Don't reset isPlaying when paused, keep it true to maintain UI
+        });
         audioRef.current.addEventListener('ended', () => setIsPlaying(false));
       }
       audioRef.current.play();
+      setIsPlaying(true);
       toast({
         title: "Playing recording",
         description: "Audio playback started",
@@ -155,6 +158,14 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
   const pausePlayback = () => {
     if (audioRef.current) {
       audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const resumePlayback = () => {
+    if (audioRef.current) {
+      audioRef.current.play();
+      setIsPlaying(true);
     }
   };
 
@@ -284,27 +295,18 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
     return (
       <>
         <div className="flex items-center gap-2">
-          {!isPlaying ? (
-            <Button
-              onClick={playRecording}
-              variant="outline"
-              size="sm"
-              className="gap-2"
-            >
-              <Play className="h-4 w-4" />
-              Play
-            </Button>
-          ) : (
+          <Button
+            onClick={isPlaying ? pausePlayback : (audioRef.current ? resumePlayback : playRecording)}
+            variant="outline"
+            size="sm"
+            className={isPlaying ? "gap-2" : "gap-2 border-green-500 text-green-600 hover:bg-green-50 hover:text-green-700"}
+          >
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            {isPlaying ? "Pause" : "Play"}
+          </Button>
+          
+          {audioRef.current && (
             <>
-              <Button
-                onClick={pausePlayback}
-                variant="outline"
-                size="sm"
-                className="gap-2"
-              >
-                <Pause className="h-4 w-4" />
-                Pause
-              </Button>
               <Button
                 onClick={skipBackward}
                 variant="outline"
@@ -325,11 +327,12 @@ export const AudioRecorder = ({ appointmentId, onRecordingComplete }: AudioRecor
               </Button>
             </>
           )}
+          
           <Button
             onClick={() => setShowDeleteDialog(true)}
-            variant="destructive"
+            variant="outline"
             size="sm"
-            className="gap-2"
+            className="gap-2 border-red-300 text-red-400 hover:bg-red-50 hover:text-red-500 opacity-60 hover:opacity-100"
             disabled={isDeleting}
           >
             <Trash2 className="h-4 w-4" />
