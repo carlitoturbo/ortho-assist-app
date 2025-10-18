@@ -12,6 +12,7 @@ import AppointmentDetail from "./pages/AppointmentDetail";
 import Patients from "./pages/Patients";
 import PatientDetail from "./pages/PatientDetail";
 import PatientAppointmentDetail from "./pages/PatientAppointmentDetail";
+import Billing from "./pages/Billing";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import toothIcon from "@/assets/tooth-icon.png";
@@ -49,6 +50,7 @@ const App = () => (
           <Route path="/planning" element={<Layout><Planning /></Layout>} />
           <Route path="/appointments" element={<Layout><Appointments /></Layout>} />
           <Route path="/appointments/:id" element={<Layout><AppointmentDetail /></Layout>} />
+          <Route path="/billing" element={<Layout><Billing /></Layout>} />
           <Route path="/settings" element={<Layout><Settings /></Layout>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
